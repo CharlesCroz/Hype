@@ -22,7 +22,7 @@ ps7_post_config
 
 # Send actual ELF to memory (using CPU0, I guess)
 targets -set -nocase -filter {name =~ "*A9*#0"}
-dow ./HW/Vitis/Kernel/Debug/Kernel.elf
+dow ./HW/Vitis/Kernel/Release/Kernel.elf
 configparams force-mem-access 0
 
 # Starts CPU0
