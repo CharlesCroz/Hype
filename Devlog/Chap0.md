@@ -22,7 +22,7 @@ Mumuse avec **xsdb**, notament les commandes `mr`, `mw` (Memory Read/Write), `rr
 
 Petit outil python de décodage : `python3 ./Tools/decoder.py --help`
 
-Et le *main.c* qui va avec, pour transférer les registres du CP15 (qui gère notamment la mémoire) vers un registres, puis printf la valeur
+Et le *main.c* qui va avec, pour transférer les registres du CP15 (qui gère notamment la mémoire) vers un registre, puis printf la valeur :
 ```C
 void print_reg(char *name, unsigned int reg){
     char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -139,9 +139,9 @@ Les nouvelles options :
 - `-Lxxx` : FINALLY ! `.o` and `.d` 
 - `-Wl,--start-group,-lxil,-lgcc,-lc,--end-group` : *The archives should be a list of archive files.  They may be either explicit file names, or -l options. The specified archives are searched repeatedly until no new undefined references are created.  Normally, an archive is searched only once in the order that it is specified on the command line.  If a symbol in that  archive  is needed  to resolve an undefined symbol referred to by an object in an archive that appears later on the command line, the linker would not be able to resolve that reference.  By grouping the archives, they will all be searched repeatedly until all possible references are resolved. Using this option has a significant performance cost.  It is best to use it only when there are unavoidable circular references between two or more archives.*
 
-Bon.
+Bon. Très content d'avoir creusé de ce côté, et trouvé les fichiers et les lignes de commandes. On a des ingrédients un peu en vrac, avec beaucoup de liens absolus.... Mais on commence à savoir où est quoi.
 
-On a des ingrédients un peu en vrac, avec beaucoup de liens absolus.... Mais on commence à savoir où est quoi.
+## Mon make à moi
 
 Todo : Faire le tri dans les sources pour extraire "Juste ce qu'il faut". Et Mettre en place la compilation hors de Vitis.
 Todo : comprendre comment est générée la table de MMU, et surement d'autres bricoles utiles !
