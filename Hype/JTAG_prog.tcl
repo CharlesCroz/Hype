@@ -27,3 +27,6 @@ configparams force-mem-access 0
 
 # Starts CPU0
 con
+
+# No .Xil file plizzz
+file delete -force .Xil
