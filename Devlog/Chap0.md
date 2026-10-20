@@ -1,28 +1,28 @@
 # Chapitre 0 - Hello World
 
-Premier objectif : les outils, et un premier Hello World **utilisable** à partir des outils Xilinx. En particulier le GCC "qui va bien" pour pouvoir booter en JTAG ou sur carte SD.
+First goal : tools, and a first **usable** Hello world from Xilinx tools. In particular, the correct GCC and the skeleton of a code that boots (JTAG or SD).
 
-## Projet Vivado
+## Vivado Project
 
-Zybo_GPIO_led_sws_INT_btn.xsa : Dans la PL, GPIO pour les 4 leds et les 4 switchs à l'adresse 0x4000_0000, et les 4 boutons sur le contrôlleur d'interruption [64-61].
+Zybo_GPIO_led_sws_INT_btn.xsa : Inside the PL (I assume you've played with Vivado and Vitis. If not, consider it's hardware), a GPIO AXI IP controling 4 leds and 4 switchs at address 0x4000_0000, and the 4 buttons connectd to iterrupt controller [64-61].
 
-## Projet Vitis
+## Vitis Project
 
-Creation du projet avec l'Application Hello World sur le CPU0 à partir du XSA. Compilée et testée avec succès sur Vitis.
+I created an Application Hello wold Project on CPU0 from the Vivado generated XSA. Compiled and successfully programmed to the card using Vitis. Good, next.
 
-A partir de la console Vitis, extraction des commandes tcl à exécuter pour correctement programmer la carte.
-Les filtres ont été modifiés pour anonymiser notamment mes cartes (numéro de série du JTAG dans les commandes) et utiliser des chemins relatifs pour les fichiers.
-Commande utile dans **xsdb** : `targets -target-properties` (pour comprendre les filtres).
+From the Vitis console, I extracted tcl commands that were used to program the hardware. I modified the xsdb commands have been modified to "anonymize" the cards (JTAG serial numbers for instance) and relative paths instead of absolute paths have been used in filenames.
 
-## Détour MMU
+Useful **xsdb** command : `targets -target-properties` (to understand what target filters target).
 
-Après avoir fait joujou avec **objdump** sur le Kernel.elf généré et un fsbl.elf, j'ai vu que par défaut le linker script envoie le code Kernel dans la DDR (0x10_0000) et le fsbl dans l'OCM (On Chip Memory, 0x0). Première modif de *lscript.ld* réussie.
+## Detour near MMU
 
-Mumuse avec **xsdb**, notament les commandes `mr`, `mw` (Memory Read/Write), `rrd`, `rwr` (Register ReaD/WRite), et l'assembleur `mcr` (Move to Coprocessor from Register) et `mrc` (Move to Register from Coprocessor), compilé en ligne pour avoir la valeur en hexa de l'instruction.
+After playing a little with **objdump** on the generated Kernel.elf and a generated fsbl.elf somewhere in the Vitis project, I noticed that the linker script places the Kernel code to DDR (0x10_0000) while the fsbl places it in the OCM (On Chip Memory, 0x0). First time playing with *lscript.ld* linker script was a success !
 
-Petit outil python de décodage : `python3 ./Tools/decoder.py --help`
+More fun with **xsdb**, in particular `mr`, `mw` (Memory Read/Write), `rrd`, `rwr` (Register ReaD/WRite), et assembler `mcr` (Move to Coprocessor from Register) and `mrc` (Move to Register from Coprocessor), using an online compiling tool to get the hex value of the instruction from assembler.
 
-Et le *main.c* qui va avec, pour transférer les registres du CP15 (qui gère notamment la mémoire) vers un registre, puis printf la valeur :
+Little python tool to decode registers values : `python3 ./Tools/decoder.py --help`
+
+And the new *main.c*, to copy registers values from CP15 to general register for display :
 ```C
 void print_reg(char *name, unsigned int reg){
     char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -45,7 +45,6 @@ int main()
 {
     unsigned int reg = 0;
 
-    init_platform();
     print("Hello World\n\r");
 
     __asm ("mrc p15, 0, %[result], c2, c0, 0" : [result] "=r" (reg) :);
@@ -57,12 +56,11 @@ int main()
     __asm ("mrc p15, 0, %[result], c2, c0, 2" : [result] "=r" (reg) :);
     print_reg("TTBCR", reg);
 
-    cleanup_platform();
     return 0;
 }
 ```
 
-La translation table L1 est à l'addresse 0x4000 (cf. le resultat en console xsdb de `dow .[...]/Kernel.elf`) et mappe les 4Go d'adresse virtuelle vers les mêmes adresses physiques, avec des permissions différentes.
+We see from this (and other things) that MMU level 1 tranlsation table is at address 0x4000, cf. for instance the result using **xsdb** of the line `dow .[...]/Kernel.elf`. It maps the 4GB of virtual address to the same physical addresses, but having different permission and cache properties.
 
 ```
 Downloading Program -- /[...]/Hype/HW/Vitis/Kernel/Release/Kernel.elf                                         
@@ -80,20 +78,23 @@ Downloading Program -- /[...]/Hype/HW/Vitis/Kernel/Release/Kernel.elf
 	section, .stack: 0x0000a360 - 0x0000db5f
 ```
 
-Par exemple `00015DE6` (première entrée de la table @0x4000) vs `40000C02` (@0x5000) vs `C0000000` (@0x7000) :
+For instance `00015DE6` (first table entry @0x4000) vs `40000C02` (@0x5000) vs `C0000000` (@0x7000) :
 - `00015DE6` : Range `0x0000_0000-0x0010_0000` -> **DDR/OCM** -> S/TEX/AP/Domain/B bits are set
 - `40000C02` : Range `0x4000_0000-0x4010_0000` -> **FPGA** -> S/TEX/AP/Domain/B bits are unset
 - `C0000000` : Range `0xC000_0000-0xC000_0000` -> **Not in system-level address map** -> Fault
 
-## Projet Vitis (suite)
+## Vitis project (resuming)
 
-La sortie du makefile "Application" de Vitis montre qu'il y a trois étapes à ce stade : `helloworld.c -> helloworld.o`, `platform.c -> platform.o` et la création du `Kernel.elf`
+The Application makefile output shows three steps : 
+1. `helloworld.c -> helloworld.o`
+1. `platform.c -> platform.o`
+1. `*.o -> Kernel.elf`
 
-Pour le premier, le log donne : 
+The first log goes : 
 
 `arm-none-eabi-gcc -Wall -O2 -c -fmessage-length=0 -MT"src/helloworld.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I/[...]/Hype/HW/Vitis/Zybo_GPIO_led_sws_INT_btn/export/Zybo_GPIO_led_sws_INT_btn/sw/Zybo_GPIO_led_sws_INT_btn/standalone_ps7_cortexa9_0/bspinclude/include -MMD -MP -MF"src/helloworld.d" -MT"src/helloworld.o" -o "src/helloworld.o" "../src/helloworld.c"`
 
-Les options :
+With options :
 - `-Wall` : All warnings
 - `-O2` : *Optimize even more. GCC performs nearly all supported optimizations that do not involve a space-speed tradeoff.*
 - `-c` : Not linked (yet)
@@ -108,7 +109,7 @@ Les options :
 - `-MF"src/helloworld.d"` : *When used with -M or -MM, specifies a file to write the dependencies to. If no -MF switch is given the preprocessor sends the rules to the same place it would send preprocessed output. When used with the driver options -MD or -MMD, -MF overrides the default dependency output file. If file is -, then the dependencies are written to stdout.*
 - `-MT"src/helloworld.o"` : *Change the target of the rule emitted by dependency generation. By default CPP takes the name of the main input file, deletes any directory components and any file suffix such as .c, and appends the platform's usual object suffix. The result is the target.*
 
-Bon, les -M, c'est flou, mais surement utile, en attendant, le *src/helloworld.d* : 
+Ok... the -Mxxx are a bit vague, yet probably useful, like for instance the content of *src/helloworld.d* : 
 ```
 src/helloworld.o src/helloworld.o: ../src/helloworld.c ../src/platform.h \
  ../src/platform_config.h \
@@ -126,11 +127,13 @@ src/helloworld.o src/helloworld.o: ../src/helloworld.c ../src/platform.h \
 /[...]/include/xparameters_ps.h:
 ```
 
-Du header, on avance, mais on cherche encore le code... La compil' du `platform.c` c'est la meme chose. Le Kernel.elf par contre :
+It's headers, not going to spend too much time on something that is not code. Compiling `platform.c` is the same. 
+
+But Kernel.elf is different:
 
 `arm-none-eabi-gcc -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L/[...]/Hype/HW/Vitis/Zybo_GPIO_led_sws_INT_btn/export/Zybo_GPIO_led_sws_INT_btn/sw/Zybo_GPIO_led_sws_INT_btn/standalone_ps7_cortexa9_0/bsplib/lib -o "Kernel.elf" ./src/helloworld.o ./src/platform.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group`
 
-Les nouvelles options :
+New options:
 
 - `-Wl,xxx` : Linker options (`man arm-none-eabi-ld`)
 - `-Wl,-build-id=none` : *Request the creation of a ".note.gnu.build-id" ELF note section or a ".buildid" COFF section. [...] Passing "none" for style disables the setting from any "--build-id" options earlier on the command line.*
@@ -139,9 +142,27 @@ Les nouvelles options :
 - `-Lxxx` : FINALLY ! `.o` and `.d` 
 - `-Wl,--start-group,-lxil,-lgcc,-lc,--end-group` : *The archives should be a list of archive files.  They may be either explicit file names, or -l options. The specified archives are searched repeatedly until no new undefined references are created.  Normally, an archive is searched only once in the order that it is specified on the command line.  If a symbol in that  archive  is needed  to resolve an undefined symbol referred to by an object in an archive that appears later on the command line, the linker would not be able to resolve that reference.  By grouping the archives, they will all be searched repeatedly until all possible references are resolved. Using this option has a significant performance cost.  It is best to use it only when there are unavoidable circular references between two or more archives.*
 
-Bon. Très content d'avoir creusé de ce côté, et trouvé les fichiers et les lignes de commandes. On a des ingrédients un peu en vrac, avec beaucoup de liens absolus.... Mais on commence à savoir où est quoi.
+Well. That's good! I'm glad I took the time to look at this, and found the .o related to all the low level functions specific to the target. Now that's a lot of ingredients, lots of absolute paths. But it's getting a bit clearer ! What is where, when is what used.
 
 ## Mon make à moi
 
-Todo : Faire le tri dans les sources pour extraire "Juste ce qu'il faut". Et Mettre en place la compilation hors de Vitis.
-Todo : comprendre comment est générée la table de MMU, et surement d'autres bricoles utiles !
+So, let's set asside all the .o, .h, lscript.ld, Xilinx.spec and here we go ! Take an old Makefile and... 
+
+Here it is ! [Hype has a folder](../Hype/) ! 
+
+```
+===================================
+==========   HYPE v0.0   ==========
+===================================
+
+
+Some registers :
+> TTBR0 0x0000405b
+> TTBR1 0x00010000
+> TTBCR 0x00000000
+
+
+			Bisous
+```
+
+Todo : investigate linker warning `warning: obj/boot.elf has a LOAD segment with RWX permissions`
