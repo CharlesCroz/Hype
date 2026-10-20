@@ -4,6 +4,10 @@ Hypervisor for Zynq-7000 based device
 ## Context
 This is a self-training project to understand better the lowest layers of complex embedded software, notably how to develop a layer that will handle hardware capabilities (interrupts, memory, connected devices).
 
+## Progress
+
+See the Developper's log [here](./Devlog/) !
+
 ## Specifications (high level)
 The hypervisor Hype shall provide TSP for several Partitions to run concurrently on a Zynq-7000 based device. 
 
