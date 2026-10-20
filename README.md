@@ -6,7 +6,9 @@ This is a self-training project to understand better the lowest layers of comple
 
 ## Progress
 
-See the Developper's log [here](./Devlog/) !
+See the Developper's log here : [Devlog](./Devlog/) !
+
+See the code here : [Hype](./Hype/) !
 
 ## Specifications (high level)
 The hypervisor Hype shall provide TSP for several Partitions to run concurrently on a Zynq-7000 based device. 
