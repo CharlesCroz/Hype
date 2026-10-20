@@ -8,21 +8,21 @@ after 500
 
 # Load bitstream (target 4, the xc7z020 weirdo at the end)
 targets -set -nocase -filter {name !~"APU*" && level == 0}
-fpga -file ./HW/Vitis/Kernel/_ide/bitstream/design_1_wrapper.bit
+fpga -file ./kernel/arm/hw/Zybo_GPIO_led_sws_INT_btn.bit
 
 # Set things related to PL memory mapping ? Todo : research more
 targets -set -nocase -filter {name =~"APU*" && level == 0}
-loadhw -hw ./HW/Vitis/Zybo_GPIO_led_sws_INT_btn/export/Zybo_GPIO_led_sws_INT_btn/hw/Zybo_GPIO_led_sws_INT_btn.xsa -mem-ranges [list {0x40000000 0xbfffffff}] -regs
+loadhw -hw ./kernel/arm/hw/Zybo_GPIO_led_sws_INT_btn.xsa -mem-ranges [list {0x40000000 0xbfffffff}] -regs
 configparams force-mem-access 1
 
 # Initializing cores ? Todo : research more
-source ./HW/Vitis/Kernel/_ide/psinit/ps7_init.tcl
+source ./kernel/arm/hw/ps7_init.tcl
 ps7_init
 ps7_post_config
 
 # Send actual ELF to memory (using CPU0, I guess)
 targets -set -nocase -filter {name =~ "*A9*#0"}
-dow ./HW/Vitis/Kernel/Release/Kernel.elf
+dow ./kernel/boot/obj/boot.elf
 configparams force-mem-access 0
 
 # Starts CPU0
