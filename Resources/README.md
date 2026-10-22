@@ -6,6 +6,8 @@
 
 [Arm Cortex A9 Programmer's Guide](./arm-cortex-a-prog-guide-v4.pdf)
 
+[UG-585 : Zynq 7000 SoC Technical Reference Manual](./ug585-zynq-7000-SoC-TRM.pdf)
+
 ## Links
 
 Target GCC download : https://learn.arm.com/install-guides/gcc/arm-gnu/
