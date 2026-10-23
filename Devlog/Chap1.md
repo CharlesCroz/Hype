@@ -65,3 +65,54 @@ void _kprint(char *string){
 ```
 
 The compiler used the keywork static to treat `_kprint_putchar` as an inlined function. Who am I to judge ? Actually, it' s just a few instructions, often repeated, so I'm glad it saved the jumps.
+
+## Yes, but buttons iterrupts ?
+
+So, button on the board are connected to the PL, then to the GIC lines 61 to 64. According to UG-585, that means I have to enable configure "something" in registers ICDICFR3[31:30] for button 0 at IRQ ID 61, and ICDIFR4[1:0], ICDIFR4[3:2], ICDIFR4[5:4] for buttons 1, 2, 3 at IRQ ID 62, 63, 64.
+
+The two bytes ? No idea. Oh, and this :
+> Targeting the CPU is done by the ICDIPTR [23:8] registers. The sensitivity of each SPI interrupt must be programmed to match those listed in Table 1, PS and PL Shared Peripheral Interrupts (SPI). The sensitivity is programmed using the ICDICFR [5:2] registers.
+
+Xilinx doc is... well, it is what it is. **But** they mention the GIC component, pl390. Let's check the [online documentation](https://support.arm.com/documentation/ddi0416/b/) then....
+
+Oh, but Altera did something (see [Resources](../Resources/)) ! Apero is calling, but let's try something.
+
+## SCU, GIC, CPSR
+
+So, to actually have your CPU recieve interrupts, you have to :
+- Enable the SCU (SCU Control Register 0xF8F00000)
+- Enable the GIC, and set the priority mask to allow all (for now)
+  - By the way, priority and priority mask is 5 bits... oh, and not 0b11111, no... 0b11111000 = 0xF8, they are shifted 3 bits...
+- Enable the signaling of the interrupts
+- Enable the distribution of the interrupts
+- Configure the distribution, per interrupt ID (let's call this '#id')
+  - Enable interrupt #id (at the right spot of the correct ICDISERn register - 1 bit)
+  - Set the interrupt priority (idem in a ICDIPRn register - 8 bits, but remember, it's masked by 0xF8)
+  - Set the CPU to relay the interrupt (ICDIPTRn - 8 bits)
+  - Set the sensitivity (edge = 1 or active = 0, in a ICDICFRn register - 2 bits, but only the higher bit has to be set)
+
+Oh, and you can configure it somewhere to send FIQ or IRQ, but... Not today !
+
+Good, now you just have to process it.
+```assembly
+IRQHandler:					    /* IRQ vector handler */
+	push	{lr}
+	bl		handle_irq
+	pop 	{lr}
+	subs	pc, lr, #4			/* adjust return */
+```
+
+To process it, it's actually pretty straightforward :
+- Read GIC ICCIAR register to retrieve interrupt ID.
+- Handle th sh*t out of it (I... printed something...)
+- Write the interrupt ID to ICCEOIR register.
+
+Recompile, flash, profit !
+
+![Boot and interrups](./images/Chap1_interrupts.png)
+
+I know, the code is dirty, but for now I'm trying to make sense of things. Oh, and I'm pretty sure the blocking _kprint are taking most of the execution time. I guess profiling and other testing tools should be comming next.
+
+But now that I have PL interrupts, and probably all the other ones though I didn't try them (should I make a code that purposedly hit an undefined instruction to trigger the associated exception ? Definitely ! Will I ? We'll see), next step is... Timers !
+
+## Timed interrupts

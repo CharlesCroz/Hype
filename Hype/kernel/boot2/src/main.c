@@ -1,4 +1,5 @@
 #include "kprint.h"
+#include "gic.h"
 
 void print_reg(char *reg_name, unsigned int reg_value){
     _kprint("> ");
@@ -29,6 +30,12 @@ int main()
     _kprint("\n\r\n\r\t\t\tBisous\n\r");
 
     *((int *)0x40000000) = 15;
+
+    gic_activate_irq(61, 3);
+    gic_activate_irq(62, 3);
+    gic_activate_irq(63, 3);
+    gic_activate_irq(64, 3);
+    gic_enable();
 
     return 0;
 }

@@ -16,9 +16,13 @@ _vector_table:
 /*	B	FIQHandler Undefining this so the exception directly points to FIQ handler code */
 
 FIQHandler:			            /* FIQ vector handler */
+	b 		FIQHandler			/* Infinite loop.... for now ! */
 	subs	pc, lr, #4			/* adjust return */
 
 IRQHandler:					    /* IRQ vector handler */
+	push	{lr}
+	bl		handle_irq
+	pop 	{lr}
 	subs	pc, lr, #4			/* adjust return */
 
 Undefined:					/* Undefined handler */
