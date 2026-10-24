@@ -43,7 +43,7 @@ void increase_tic(void *){
     tic_count += 1;
     if(tic_count == 100){
         second_count ++;
-        _kprint("\033[14;25H");
+        _kprint("\033[13;25H");
         _kprint_i32dec(second_count);
         _kprint("s !");
         tic_count = 0;
