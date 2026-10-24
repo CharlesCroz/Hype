@@ -14,25 +14,25 @@ void print_reg(char *reg_name, unsigned int reg_value){
 
 void key0(void *arg){
     (void) arg;
-    _kprint("\033[14;25HKey 0\n\r");
+    _kprint("\033[14;25HKey 0");
     REG_LED = REG_LED ^ 0b0001;
 }
 
 void key1(void *arg){
     (void) arg;
-    _kprint("\033[14;25HKey 1\n\r");
+    _kprint("\033[14;25HKey 1");
     REG_LED = REG_LED ^ 0b0010;
 }
 
 void key2(void *arg){
     (void) arg;
-    _kprint("\033[14;25HKey 2\n\r");
+    _kprint("\033[14;25HKey 2");
     REG_LED = REG_LED ^ 0b0100;
 }
 
 void key3(void *arg){
     (void) arg;
-    _kprint("\033[14;25HKey 3\n\r");
+    _kprint("\033[14;25HKey 3");
     REG_LED = REG_LED ^ 0b1000;
 }
 
@@ -43,7 +43,7 @@ void increase_tic(void *){
     tic_count += 1;
     if(tic_count == 100){
         second_count ++;
-        _kprint("\033[13;25H ");
+        _kprint("\033[14;25H");
         _kprint_i32dec(second_count);
         _kprint("s !");
         tic_count = 0;
