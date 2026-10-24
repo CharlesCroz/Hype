@@ -116,3 +116,27 @@ I know, the code is dirty, but for now I'm trying to make sense of things. Oh, a
 But now that I have PL interrupts, and probably all the other ones though I didn't try them (should I make a code that purposedly hit an undefined instruction to trigger the associated exception ? Definitely ! Will I ? We'll see), next step is... Timers !
 
 ## Timed interrupts
+
+So, from some official Xilinx documentation (rare enough to be mentionned, ain't it), I found what I was looking for !
+
+GIC has a private timer for each CPU. It's plugged to GID interrupt line 29, and it's easy to configure.
+
+The registers :
+- REG_LOAD, 32b "load_value"
+- REG_COUNT, counts down, hits #29 on 0
+- REG_CONTROL, [15:8] prescaler, [2] : IRQ_enable, [1] : Auto_Reload, [0] : Timer enabled
+- REG_STATUS, [0] is a sticky bit set to 1 if the timer has triggered, write 1 to reset
+
+The timer runs at half the CPU frequency, divided by (prescaler + 1). It can automatically reload load_value, so yeah, I have what I want.
+
+The right callback architecture, prescaler set to max 256, using xparameters.h `XPAR_CPU_CORTEXA9_0_CPU_CLK_FREQ_HZ` for CPU clock (I am not sure I can easily find the CPU actual frequency from within the Zynq-7000, because I guess it depends on external resonators or capacitors), and here we have it :
+
+```C
+void tic_setup(int ms_duration, void (*callback)(void *), void *param);
+```
+
+I set ms_duration to 10 ms, made a callback that counts 100 tics for a glorious second, and voila !
+
+![](./images/Timer.webm)
+
+Another essential brick for the wall... hem... for the Hypervisor !

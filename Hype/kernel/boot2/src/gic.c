@@ -16,15 +16,30 @@
 #define GIC_ICCIAR_OFFSET   0xC
 #define GIC_ICCEOIR_OFFSET  0x10
 
+struct handler_table_entry{
+    void (*handler)(void *);
+    void *param;
+};
+
+#define IRQ_HANDLERS_COUNT 256
+struct handler_table_entry IRQ_HANDLERS_TABLE[IRQ_HANDLERS_COUNT]= { 0 };
+
 void handle_irq(){
     volatile int irq_id;
     /* Get IRQ ID*/
     irq_id = *(volatile int *)(XPAR_SCUGIC_0_CPU_BASEADDR + GIC_ICCIAR_OFFSET);
-    /* Clear IRQ ID*/
-    *(volatile int *)(XPAR_SCUGIC_0_CPU_BASEADDR + GIC_ICCEOIR_OFFSET) = irq_id;
-    _kprint("IRQ ");
-    _kprint_u32dec(irq_id);
-    _kprint(" triggered and cleared\n\r");
+    
+    /* irq_id is 3FF, there has been an error somewhere */
+    if(irq_id < IRQ_HANDLERS_COUNT){
+        /* Call handler */
+        IRQ_HANDLERS_TABLE[irq_id].handler(IRQ_HANDLERS_TABLE[irq_id].param);
+    
+        /* Clear IRQ ID*/
+        *(volatile int *)(XPAR_SCUGIC_0_CPU_BASEADDR + GIC_ICCEOIR_OFFSET) = irq_id;
+    }
+    // _kprint("IRQ ");
+    // _kprint_u32dec(irq_id);
+    // _kprint(" triggered and cleared\n\r");
 }
 
 void gic_enable(){
@@ -44,11 +59,22 @@ void gic_enable(){
         );
 }
 
-void gic_activate_irq(int id, int priority){
+void gic_activate_irq(unsigned int id, 
+                        int priority, 
+                        void (*handler)(void *),
+                        void *param){
     int reg_address;
     int reg_value;
 
-    _kprint("\n\r");
+    /* Check 0 <= id < 256 */
+    if(id >= IRQ_HANDLERS_COUNT){
+        return;
+    }
+
+    /* Set handler */
+    IRQ_HANDLERS_TABLE[id].handler = handler;
+    IRQ_HANDLERS_TABLE[id].param = param;
+
     /* Set enable */
     reg_address = XPAR_SCUGIC_0_DIST_BASEADDR + GIC_ICDISERn_OFFSET + (id / 32) * 4;
     reg_value = 1 << (id % 32);

@@ -2,6 +2,9 @@
 #define __PROT_GIC
 
 void gic_enable();
-void gic_activate_irq(int id, int priority);
+void gic_activate_irq(unsigned int id, 
+                        int priority, 
+                        void (*handler)(void *),
+                        void *param);
 
 #endif
