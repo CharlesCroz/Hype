@@ -135,8 +135,8 @@ The right callback architecture, prescaler set to max 256, using xparameters.h `
 void tic_setup(int ms_duration, void (*callback)(void *), void *param);
 ```
 
-I set ms_duration to 10 ms, made a callback that counts 100 tics for a glorious second, and voila !
+I set ms_duration to 10 ms, made a callback that counts 100 tics for a glorious second, and voila ! The gif is ugly, blame it on ffmpeg...
 
-![](./images/Timer.webm)
+![](./images/Timer.gif)
 
 Another essential brick for the wall... hem... for the Hypervisor !
