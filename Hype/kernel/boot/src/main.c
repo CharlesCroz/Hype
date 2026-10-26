@@ -1,53 +1,64 @@
-/******************************************************************************
-* Copyright (C) 2023 Advanced Micro Devices, Inc. All Rights Reserved.
-* SPDX-License-Identifier: MIT
-******************************************************************************/
-/*
- * helloworld.c: simple test application
- *
- * This application configures UART 16550 to baud rate 9600.
- * PS7 UART (Zynq) is not initialized by this application, since
- * bootrom/bsp configures it to baud rate 115200
- *
- * ------------------------------------------------
- * | UART TYPE   BAUD RATE                        |
- * ------------------------------------------------
- *   uartns550   9600
- *   uartlite    Configurable only in HW design
- *   ps7_uart    115200 (configured by bootrom/bsp)
- */
+#include "kprint.h"
+#include "gic.h"
+#include "tic.h"
 
-#include <stdio.h>
-#include "xil_printf.h"
+#define REG_LED *((volatile int *)0x40000000)
+
+void print_reg(char *reg_name, unsigned int reg_value){
+    _kprint("> ");
+    _kprint(reg_name);
+    _kprint(" ");
+    _kprint_u32hex(reg_value);
+    _kprint("\n\r");
+}
+
+void key0(void *arg){
+    (void) arg;
+    _kprint("\033[14;25HKey 0");
+    REG_LED = REG_LED ^ 0b0001;
+}
+
+void key1(void *arg){
+    (void) arg;
+    _kprint("\033[14;25HKey 1");
+    REG_LED = REG_LED ^ 0b0010;
+}
+
+void key2(void *arg){
+    (void) arg;
+    _kprint("\033[14;25HKey 2");
+    REG_LED = REG_LED ^ 0b0100;
+}
+
+void key3(void *arg){
+    (void) arg;
+    _kprint("\033[14;25HKey 3");
+    REG_LED = REG_LED ^ 0b1000;
+}
 
 
-void print_reg(char *name, unsigned int reg){
-    char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    char buff[11] = {'\0'};
-
-    print("> ");
-    print(name);
-    print(" 0x");
-
-    for(int i = 7; i >= 0; i--){
-        buff[7-i] = hex[(reg >> (4*i)) & 0xF];
+void increase_tic(void *){
+    static int tic_count = 0;
+    static int second_count = 0;
+    tic_count += 1;
+    if(tic_count == 100){
+        second_count ++;
+        _kprint("\033[13;25H");
+        _kprint_i32dec(second_count);
+        _kprint("s !");
+        tic_count = 0;
     }
-    buff[8] = '\n';
-    buff[9] = '\r';
-    buff[10] = '\0';
-
-    print(buff);
 }
 
 int main()
 {
-    unsigned int reg = 0;
+    unsigned int reg;
 
-    print("\033[2J\033[0;0H");
-    print("===================================\n\r");
-    print("==========   HYPE v0.0   ==========\n\r");
-    print("===================================\n\r");
-    print("\n\r\n\rSome registers :\n\r");
+    _kprint("\033[2J\033[0;0H");
+    _kprint("===================================\n\r");
+    _kprint("==========   HYPE v0.0   ==========\n\r");
+    _kprint("===================================\n\r");
+    _kprint("\n\r\n\rSome registers :\n\r");
     
     __asm ("mrc p15, 0, %[result], c2, c0, 0" : [result] "=r" (reg) :);
     print_reg("TTBR0", reg);
@@ -57,8 +68,16 @@ int main()
     
     __asm ("mrc p15, 0, %[result], c2, c0, 2" : [result] "=r" (reg) :);
     print_reg("TTBCR", reg);
-    print("\n\r\n\r\t\t\tBisous\n\r");
+    _kprint("\n\r\n\r\t\t\tBisous\n\r");
 
+    *((volatile int *)0x40000000) = 15;
+
+    gic_activate_irq(61, 3, key0, 0);
+    gic_activate_irq(62, 3, key1, 0);
+    gic_activate_irq(63, 3, key2, 0);
+    gic_activate_irq(64, 3, key3, 0);
+    tic_setup(10, increase_tic, 0);
+    gic_enable();
 
     return 0;
 }
