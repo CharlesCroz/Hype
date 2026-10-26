@@ -2,6 +2,7 @@
 #include "gic.h"
 #include "xparameters.h"
 #include "kprint.h"
+#include <stdint.h>
 
 #define REG_LOAD    *(volatile int *)(XPAR_PS7_SCUTIMER_0_BASEADDR + 0x0)
 #define REG_COUNT   *(volatile int *)(XPAR_PS7_SCUTIMER_0_BASEADDR + 0x4)
@@ -23,9 +24,9 @@ void tic_setup(int ms_duration, void (*callback)(void *), void *param){
     /* Prescale to 249, so F_timer is F_CPU/(2*(249+1)) = F_CPU/500 */
     /* For F_CPU = 666MHz, we get F_Fimer = 1.33MHz */
     /* So, duration = load_value * F_timer, 
-    i.e load_value = duration (s) * F_CPU/500 = duration (ms) * F_CPU/500_000  */
+    i.e load_value = duration (s) * F_CPU/(2 * (prescaler + 1)) = duration (ms) * F_CPU/(2000 * (prescaler + 1))  */
     prescaler = 255;
-    load_value = ms_duration * (XPAR_CPU_CORTEXA9_0_CPU_CLK_FREQ_HZ / 500000);
+    load_value = (uint64_t)ms_duration * (uint64_t)(XPAR_CPU_CORTEXA9_0_CPU_CLK_FREQ_HZ) / (2000 * (1 + prescaler));
 
     /* Set call back (extra care to clean REG_STATUS) */
     handle_tic_function = callback;
