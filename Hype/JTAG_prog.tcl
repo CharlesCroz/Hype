@@ -22,7 +22,7 @@ ps7_post_config
 
 # Send actual ELF to memory (using CPU0, I guess)
 targets -set -nocase -filter {name =~ "*A9*#0"}
-dow ./kernel/boot2/obj/boot.elf
+dow ./kernel/boot/obj/boot.elf
 configparams force-mem-access 0
 
 # Starts CPU0
