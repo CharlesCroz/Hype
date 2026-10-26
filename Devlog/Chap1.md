@@ -142,3 +142,5 @@ The gif is ugly, blame it on ffmpeg... Check the [avi file](./images/Timer.avi).
 ![](./images/Timer.gif)
 
 Another essential brick for the wall... hem... for the Hypervisor !
+
+Next ? A real driver using UART interrupts to go beyong the 64 bytes ? I'll keep that in mind. First, another look ath the MMU !
