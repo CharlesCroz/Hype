@@ -34,7 +34,12 @@ SVCHandler:					/* SWI handler */
 
 DataAbortHandler:				/* Data Abort handler */
 	dsb
-	subs	pc, lr, #8			/* points to the instruction that caused the Data Abort exception */
+	push	{lr}
+	bl		handle_data_abort
+	pop 	{lr}
+	@ subs	pc, lr, #8			/* points to the instruction that caused the Data Abort exception */
+dead:
+	b dead
 
 PrefetchAbortHandler:				/* Prefetch Abort handler */
 	dsb

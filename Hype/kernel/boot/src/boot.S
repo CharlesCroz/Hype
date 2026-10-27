@@ -70,6 +70,11 @@ _boot_invalidate_cache_wayloop:
 	orr	r0, r0, #1 
 	mcr	p15, 0, r0, c1, c0, 0
 
+    /* Allow Interrupts in CPSR */
+    mrs r1, cpsr
+    bic r1, #(0x1 << 8) /* Clear A bit to unmask async interrupts */
+    msr cpsr_x, r1 /* _x to update the fcking secod byte of CPSR */
+
 @ Set main return address to _exit
 	ldr sp, =_stack
 	ldr lr, =_exit
