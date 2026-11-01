@@ -1,4 +1,4 @@
-# Chapitre 1 - MMU
+# Chapitre 2 - MMU
 
 Time too look more into MMU, especially permission bits and how to maintain a kernel table vs app table.
 
@@ -60,3 +60,4 @@ Personnal reminder : Domains, CPSR_[suffix:fsxc], TLB (cached table) ivalidation
 ## Now what
 
 I guess I'll have to... start thinking about making an actual hypervisor with actual processes doing actual things ? It terrifies me !
+
