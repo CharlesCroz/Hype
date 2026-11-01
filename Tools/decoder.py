@@ -144,7 +144,7 @@ def main(**kwargs):
     if verbose:
         for e in registers[reg]:
             if len(e["verbose"].strip()):
-                print(f"\n{e["name"]} : {e["verbose"].strip()}")
+                print(f"\n{e["name"]} 0x{e["bits"]:0X} : {e["verbose"].strip()}")
 
 
     
