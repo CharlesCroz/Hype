@@ -1,0 +1,193 @@
+<mxfile host="Electron" pages="3">
+  <diagram name="Memory Mapping" id="aNaTsqRYKiyTNQSZYP5y">
+    <mxGraphModel dx="1414" dy="776" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="Virtual addresses" vertex="1">
+          <mxGeometry height="240" width="220" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font&gt;Process A&lt;/font&gt;&lt;div&gt;&lt;font&gt;0x0000_0000-0x(MaxA)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="200" x="50" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font&gt;Process B&lt;br&gt;0x0000_0000-0x(MaxB)&lt;br&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="200" x="50" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font&gt;Process C&lt;/font&gt;&lt;div&gt;0x0000_0000-0x(MaxC)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="200" x="50" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;&lt;font&gt;Kernel Code&lt;/font&gt;&lt;/div&gt;&lt;div&gt;0x0000_0000-0xFFFF_FFFF&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="200" x="50" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="Physical addresses" vertex="1">
+          <mxGeometry height="430" width="260" x="340" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="OCM&lt;div&gt;0x0000_0000 - 0x0003_FFFF&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="360" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="DDR&lt;div&gt;0x0004_0000 - 0x3FFF_FFFF&lt;/div&gt;&lt;div&gt;May contains holes&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="220" x="360" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font&gt;Process A&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="200" x="370" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font&gt;Process B&lt;br&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="200" x="370" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font&gt;Process C&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="200" x="370" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="FPGA GP0&lt;div&gt;0x4000_0000 - 0x7FFF_FFFF&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="220" x="360" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="FPGA GP0&lt;div&gt;0x8000_0000 - 0xBFFF_FFFF&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="220" x="360" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-20" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Memory Mapping" vertex="1">
+          <mxGeometry height="30" width="230" x="180" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;&lt;font&gt;Kernel Code&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="20" width="200" x="370" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-23" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="&lt;div&gt;Other I/O, Mapped registers, etc.&lt;br&gt;0xE000_0000 - 0xFFFF_FFFF&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="220" x="360" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="fG4H-Tw6yX1ah-1DNMex-24" edge="1" parent="1" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;defaultLabelBackgroundColor=page;" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="260" y="169.5" as="sourcePoint" />
+            <mxPoint x="340" y="169.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="QMuQ3VoRXWVP8xp2OAjE" name="Sequencing">
+    <mxGraphModel dx="982" dy="539" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-2" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;defaultLabelBackgroundColor=page;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="40" y="230" as="sourcePoint" />
+            <mxPoint x="720" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-3" connectable="0" parent="x4p8-Srdy1yQxUWpGhEH-2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];inheritText=1;defaultLabelBackgroundColor=page;" value="Time" vertex="1">
+          <mxGeometry relative="1" x="0.5" y="-1" as="geometry">
+            <mxPoint x="120" y="9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-4" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="560" y="250" as="sourcePoint" />
+            <mxPoint x="560" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-5" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="80" y="250" as="sourcePoint" />
+            <mxPoint x="80" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-6" parent="1" style="shape=curlyBracket;whiteSpace=wrap;html=1;rounded=1;flipH=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;labelPerimeter=1;legacyAnchorPoints=0;rotation=90;" value="" vertex="1">
+          <mxGeometry height="480" width="20" x="310" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Sequencing Period" vertex="1">
+          <mxGeometry height="30" width="120" x="260" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Repeat&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(#000000, var(--ge-light-color, #ffffff));&quot;&gt;Sequencing Period&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="590" y="275" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="CPU 0" vertex="1">
+          <mxGeometry height="30" width="60" x="20" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="CPU 1" vertex="1">
+          <mxGeometry height="30" width="60" x="20" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Nothing for now !" vertex="1">
+          <mxGeometry height="30" width="110" x="145" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="A" vertex="1">
+          <mxGeometry height="60" width="70" x="80" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-13" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Time Sequencing Example" vertex="1">
+          <mxGeometry height="30" width="170" x="215" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="B" vertex="1">
+          <mxGeometry height="60" width="70" x="150" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="A" vertex="1">
+          <mxGeometry height="60" width="10" x="220" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="C" vertex="1">
+          <mxGeometry height="60" width="180" x="300" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="B" vertex="1">
+          <mxGeometry height="60" width="40" x="480" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="C" vertex="1">
+          <mxGeometry height="60" width="40" x="520" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="A" vertex="1">
+          <mxGeometry height="60" width="70" x="560" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-21" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="B" vertex="1">
+          <mxGeometry height="60" width="70" x="630" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="x4p8-Srdy1yQxUWpGhEH-23" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Idle" vertex="1">
+          <mxGeometry height="30" width="40" x="245" y="95" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="BpOcYVEBrv2HjGtVyvfy" name="System Calls Example">
+    <mxGraphModel dx="982" dy="539" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ooCDg26eQI8iLe5zztj3-29" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="Process A" vertex="1">
+          <mxGeometry height="110" width="160" x="120" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="Kernel" vertex="1">
+          <mxGeometry height="120" width="160" x="120" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" value="Process A" vertex="1">
+          <mxGeometry height="140" width="160" x="120" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-2" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;defaultLabelBackgroundColor=page;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="80" y="40" as="sourcePoint" />
+            <mxPoint x="80" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-35" edge="1" parent="1" source="ooCDg26eQI8iLe5zztj3-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="ooCDg26eQI8iLe5zztj3-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(#000000, var(--ge-light-color, #ffffff));&quot;&gt;Header/statlic lib :&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(#000000, var(--ge-light-color, #ffffff));&quot;&gt;r = syscall1(SYSCALL_GET_TIME, *time)&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="240" x="320" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-19" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Time" vertex="1">
+          <mxGeometry height="30" width="60" x="20" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Regular code execution" vertex="1">
+          <mxGeometry height="30" width="140" x="130" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-32" edge="1" parent="1" source="ooCDg26eQI8iLe5zztj3-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="ooCDg26eQI8iLe5zztj3-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-21" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="r = hype_get_time(*time)" vertex="1">
+          <mxGeometry height="30" width="140" x="130" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-31" edge="1" parent="1" source="ooCDg26eQI8iLe5zztj3-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="ooCDg26eQI8iLe5zztj3-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-28" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=top;" value="SWI Handler&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(#000000, var(--ge-light-color, #ffffff));&quot;&gt;Checks permission, perform task, set return values and/or errno&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="130" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="ooCDg26eQI8iLe5zztj3-30" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Resumes regular code (check return value, handle errors, retry, etc.)" vertex="1">
+          <mxGeometry height="70" width="140" x="130" y="330" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
