@@ -57,3 +57,4 @@ dkms.conf
 # Custom edits
 .Xil
 HW
+.venv

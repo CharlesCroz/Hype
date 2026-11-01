@@ -42,9 +42,9 @@ It took me some time to write these. I have no idea how long this will take to m
 
 ### Configuration files
 
-For now, it will be two JSON configuration files :
-- system.json : should not be modified, it lists the drivers and system memory map.
-- config.json : the actual configuration file defining : 
+For now, it will be two YAML configuration files :
+- platform.yml : should not be modified, it lists the drivers and system memory map.
+- config.yml : the actual configuration file defining : 
   - The partitions
   - The partitions' driver accesses
   - The partitions' memory mapping
