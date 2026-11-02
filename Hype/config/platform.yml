@@ -1,5 +1,7 @@
 ---
-platform_name: Zynq-7000
+platform:
+  name: Zynq-7000
+
 memory:
   total_size: 0x100000000
   section_size: 0x100000
@@ -7,79 +9,93 @@ memory:
   - name: OCM
     addr_start: 0x0
     addr_end: 0x3FFFF
-    attributes:
+    domain: 0xF
+    S: 1
     tex: 0b101
     C: 0
+    B: 1
+  - name: OCM-high
+    addr_start: 0xFFF00000
+    addr_end: 0xFFFFFFFF
+    domain: 0x0
+    S: 0
+    tex: 0b100
+    C: 1
     B: 1
   - name: DDR
     addr_start: 0x10000
     addr_end: 0x3FFFFFFF
-    attributes:
+    domain: 0xF
+    S: 1
     tex: 0b101
     C: 0
     B: 1
   - name: PL-slave0
     addr_start: 0x40000000
     addr_end: 0x7FFFFFFF
-    attributes:
+    S: 0
     tex: 0
     C: 0
     B: 0
   - name: PL-slave1
     addr_start: 0x80000000
     addr_end: 0xBFFFFFFF
-    attributes:
+    S: 0
     tex: 0
     C: 0
     B: 0
   - name: mmapped-devices
     addr_start: 0xE0000000
     addr_end: 0xE02FFFFF
-    attributes:
+    S: 0
     tex: 0
     C: 0
-    B: 0
+    B: 1
   - name: NAND
     addr_start: 0xE1000000
     addr_end: 0xE1FFFFFF
-    attributes:
+    S: 0
     tex: 0
     C: 0
-    B: 0
+    B: 1
   - name: NOR
     addr_start: 0xE2000000
     addr_end: 0xE3FFFFFF
-    attributes:
+    S: 0
     tex: 0
     C: 0
-    B: 0
+    B: 1
   - name: SRAM
     addr_start: 0xE4000000
     addr_end: 0xE5FFFFFF
-    attributes:
+    S: 0
     tex: 0
     C: 0
-    B: 0
+    B: 1
   - name: AMBA-APB-Periph
-    addr_start: 0xE4000000
-    addr_end: 0xE5FFFFFF
-    attributes:
+    addr_start: 0xF8000000
+    addr_end: 0xF8FFFFFF
+    S: 0
     tex: 0
     C: 0
-    B: 0
+    B: 1
   - name: QSPI
     addr_start: 0xFC000000
     addr_end: 0xFDFFFFFF
-    attributes:
+    S: 0
     tex: 0
-    C: 0
+    C: 1
     B: 0
 
-drivers: # SYSCALL_ID : name
-  - 0 : uart_send
-  - 1 : uart_receive
-  - 2 : get_time
-  - 3 : btn_read
+drivers:
+  - name: uart_send
+    id: 0
+  - name : uart_receive
+    id: 1 
+  - name : get_time
+    id: 2 
+  - name : btn_read
+    id: 3 
 
 
 

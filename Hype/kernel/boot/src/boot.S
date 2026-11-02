@@ -59,7 +59,7 @@ _boot_invalidate_cache_wayloop:
 @ Set TTBCR to 0, TTBR0 to xx and TTBR1 to yy, DACR to 1s
 	eor r0, r0
 	mcr p15, 0, r0, c2, c0, 2	@ Write TTBCR
-	ldr r0, =MMUTable			@ MMUTable address
+	ldr r0, =MMU_TTBL_SYS			@ MMU_TTBL_SYS address
 	orr r0, r0, #0x5b 			@ Outer-cacheable, WB
 	mcr p15, 0, r0, c2, c0, 0	@ Write TTBR0
 	mvn	r0,#0					@ All ones

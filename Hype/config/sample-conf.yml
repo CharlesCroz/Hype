@@ -1,26 +1,32 @@
 ---
 partitions:
-  - term :
-      descr: "Terminal for user interaction"
-      addr_start: 0x200000
-      addr_end:   0x3FFFFF
-      permissions:
-        - uart_receive
-        - uart_send
-        - get_time
+  - name: term
+    id: 0
+    descr: "Terminal for user interaction"
+    mmap:
+      len:      0x100000
+      pa_start: 0x200000
+    permissions:
+      - uart_receive
+      - uart_send
+      - get_time
 
-  - blinky:
-      descr: "Periodically blinks LEDs"
-      addr_start: 0x300000
-      addr_end:   0x4FFFFF
-      permissions:
-        - get_time
+  - name: blinky
+    id: 1
+    descr: "Periodically blinks LEDs"
+    mmap:
+      len:      0x100000
+      pa_start: 0x1000000
+    permissions:
+      - get_time
 
-  - pushy:
-      descr: "When a button has been pressed, prints something"
-      addr_start: 0x400000
-      addr_end:   0x5FFFFF
-      permissions:
-        - uart_send
-        - btn_read
+  - name: pushy
+    id: 2
+    descr: "When a button has been pressed, prints something"
+    mmap:
+      len:      0x100000
+      pa_start: 0x1100000
+    permissions:
+      - uart_send
+      - btn_read
 

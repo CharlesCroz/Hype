@@ -8,4 +8,6 @@ This will be interesting, but not pedagocic at all. It's for me. Prior knowledge
 
 [Chapitre 1 - Interruptions](./Chap1.md)
 
-[Chapitre 1 - MMU](./Chap2.md)
+[Chapitre 2 - MMU](./Chap2.md)
+
+[Chapitre 3 - Hype 0](./Chap3.md)

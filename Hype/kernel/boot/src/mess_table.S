@@ -8,7 +8,7 @@
 mess_table:
     push { r0, r1 }
 
-	ldr r0, =MMUTable
+	ldr r0, =MMU_TTBL_SYS
     add r0, r0, #0x4
     ldr r1, [r0]
     orr r1, #(0b1 << 15) @ turn on APX

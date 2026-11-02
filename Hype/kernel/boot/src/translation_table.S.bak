@@ -2,10 +2,10 @@
 #include "bspconfig.h"
 #include "xparameters.h"
 
-.globl  MMUTable
-.section .mmu_tbl,"a"
+.globl  MMU_TTBL_SYS
+.section .MMU_TTBL_SYS_section,"a"
 
-MMUTable:
+MMU_TTBL_SYS:
 	/* Each table entry occupies one 32-bit word and there are
 	 * 4096 entries, so the entire table takes up 16KB.
 	 * Each entry covers a 1MB section.
@@ -34,7 +34,7 @@ MMUTable:
 .rept	UNDEF_REG			/*  (unassigned/reserved).
 				 * Generates a translation fault if accessed */
 .word	SECT + 0x0		/* S=b0 TEX=b000 AP=b00, Domain=b0, C=b0, B=b0 */
-.set	SECT, SECT+0x100000
+.set	SECT, SECT+0x1004000
 .endr
 
 

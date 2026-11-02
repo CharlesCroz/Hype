@@ -148,10 +148,10 @@ SECTIONS
    *(.gcc_except_table)
 } > ps7_ocm_0
 
-.mmu_tbl (ALIGN(16384)) : {
-   __mmu_tbl_start = .;
-   *(.mmu_tbl)
-   __mmu_tbl_end = .;
+.MMU_TTBL_SYS_section (ALIGN(16384)) : {
+   __MMU_TTBL_SYS_section_start = .;
+   *(.MMU_TTBL_SYS_section)
+   __MMU_TTBL_SYS_section_end = .;
 } > ps7_ocm_0
 
 .ARM.exidx : {
