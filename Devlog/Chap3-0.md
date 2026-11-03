@@ -237,5 +237,32 @@ Oh, and the MMU Tables are in boot.elf, but....
 
 The alignment is wrong (but the addresses are funny, B2C, C2C, Bac...)
 
-So... some generated linker script for data alignment ?
+So... some generated linker script for data alignment ? Here we go... 
 
+```
+.MMU_section : {
+   . = ALIGN(16384);
+   *(.MMU_TTBL_SYS_section)
+   INCLUDE MMU_lscript.ld
+} > ps7_ocm_0
+```
+
+That includes the generated aligned sections :
+
+```
+   . = ALIGN(128);
+   *(.MMU_TTBL_term_section)
+   . = ALIGN(128);
+   *(.MMU_TTBL_blinky_section)
+   . = ALIGN(128);
+   *(.MMU_TTBL_pushy_section)
+```
+
+And... it works ! Look at this beautiful 128 (0x80) Bytes ! Oh, the feeling of accomplishment!
+
+
+![MMU Tables](./images/Chap_3_0_Partition_Align_good.png)
+
+## Next
+
+Well, I don't know yet, see for yourself ! [Chapter 3, part 1](./Chap3-1.md)

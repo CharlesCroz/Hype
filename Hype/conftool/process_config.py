@@ -96,7 +96,7 @@ def make_c_partition_configuration(process_maps, template_dir, autogen_dir):
             file_template.replace("/*%%EXTERN_REF_TO_TABLES%%*/", extern_def)\
             .replace("/*%%PARTITIONS_ENTRIES%%*/", array_entries)\
             .replace("/*%%PARTITIONS_COUNT%%*/", f"{len(process_maps)}"))
-    pass
+
 
 def get_driver_list(yaml_dict):
     try:
@@ -115,7 +115,20 @@ def get_driver_list(yaml_dict):
         drivers_dict[id] = name
 
     return drivers_dict
-    
+
+
+def make_MMU_Table_lscript(process_maps, template_dir, autogen_dir):
+    with open(f"{template_dir}/MMU_lscript.template.ld", "r") as entry_template_file, \
+        open(f"{autogen_dir}/include/MMU_lscript.ld", "w") as dest_file:
+
+        entry_template = entry_template_file.read()
+        dest_file.write("".join([
+            entry_template.replace("/*%%ALIGNMENT%%*/", "128")\
+            .replace("/*%%SECTION_NAME%%*/", process_maps[id]["var_name"])
+            for id in range(len(process_maps))
+        ]))
+    pass
+
 
 def main(platform_filename, project_filename, autogen_dir, template_dir):
     with open(platform_filename) as src:
@@ -141,7 +154,7 @@ def main(platform_filename, project_filename, autogen_dir, template_dir):
     # Make headers
     shutil.copy(f"{template_dir}/partitions_configuration.h", f"{autogen_dir}/include/partitions_configuration.h")
     make_c_partition_configuration(process_maps, template_dir, autogen_dir)
-    
+    make_MMU_Table_lscript(process_maps, template_dir, autogen_dir)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates headers and linker scripts from config yaml")

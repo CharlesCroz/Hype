@@ -148,8 +148,10 @@ SECTIONS
    *(.gcc_except_table)
 } > ps7_ocm_0
 
-.MMU_TTBL_SYS_section (ALIGN(16384)) : {
+.MMU_section : {
+   . = ALIGN(16384);
    *(.MMU_TTBL_SYS_section)
+   INCLUDE MMU_lscript.ld
 } > ps7_ocm_0
 
 .ARM.exidx : {

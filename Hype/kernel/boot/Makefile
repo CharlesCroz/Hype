@@ -39,8 +39,7 @@ TARGET := $(OBJ)/$(TARGET)
 ## compiler and linker flags
 COMMON_FLAGS := -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard
 export CFLAGS  = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC) -I$(AUTOGEN_INC)
-export LDFLAGS = $(COMMON_FLAGS) -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,lscript.ld -Lobj
-
+export LDFLAGS = $(COMMON_FLAGS) -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,lscript.ld -Lobj -L$(AUTOGEN_INC)
 
 #################
 ## Rules

@@ -33,4 +33,4 @@ clean:
 	rm -f **/*.o *~
 
 veryclean: clean
-	rm -rf $(SRC)/*.c $(SRC)/*.S $(INC)/*.h $(OBJ)
+	rm -rf $(SRC)/*.c $(SRC)/*.S $(INC)/*.h $(INC)/*.ld $(OBJ)
