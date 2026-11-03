@@ -229,4 +229,13 @@ And...
 
 ![Partitions from config](./images/Chap_3_0_Partitions.png)
 
-This display (almost first try, loljk) litteraly got my eyes wet.
+This display (almost first try, jklol) litteraly got my eyes wet.
+
+Oh, and the MMU Tables are in boot.elf, but....
+
+![MMU Tables](./images/Chap_3_0_Partition_Align_bad.png)
+
+The alignment is wrong (but the addresses are funny, B2C, C2C, Bac...)
+
+So... some generated linker script for data alignment ?
+
