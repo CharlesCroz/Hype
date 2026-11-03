@@ -258,7 +258,7 @@ That includes the generated aligned sections :
    *(.MMU_TTBL_pushy_section)
 ```
 
-And... it works ! Look at this beautiful 128 (0x80) Bytes ! Oh, the feeling of accomplishment!
+And... it works ! Look at this beautiful 128/0x80-byte alignment ! Oh, the feeling of accomplishment!
 
 
 ![MMU Tables](./images/Chap_3_0_Partition_Align_good.png)
