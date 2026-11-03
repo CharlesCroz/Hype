@@ -149,9 +149,7 @@ SECTIONS
 } > ps7_ocm_0
 
 .MMU_TTBL_SYS_section (ALIGN(16384)) : {
-   __MMU_TTBL_SYS_section_start = .;
    *(.MMU_TTBL_SYS_section)
-   __MMU_TTBL_SYS_section_end = .;
 } > ps7_ocm_0
 
 .ARM.exidx : {

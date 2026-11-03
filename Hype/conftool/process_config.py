@@ -1,5 +1,6 @@
 import yaml
 import argparse
+import shutil
 
 
 class ConfigError(Exception):
@@ -23,7 +24,7 @@ def generate_MMU_TTBL_system(yaml_dict):
         raise ConfigError(f"Platform Yaml malformed.")
     
     raw_map.sort(key=lambda x: x["addr_start"])
-    print(raw_map)
+
     for i in range(len(raw_map) - 1):
         if raw_map[i]["addr_end"] >= raw_map[i+1]["addr_start"]:
             message = f"Overlap in platform memory map: {raw_map[i]["name"]} vs {raw_map[i+1]["name"]}"
@@ -53,6 +54,7 @@ def generate_MMU_TTBL_process(partition):
     pa_start = partition["mmap"]["pa_start"]
     if pa_start % (2**20) != 0:
         raise ConfigError(f"Partition {[partition["name"]]} pysical address not 2**20 aligned")
+    
     S = 1
     B = 1
     C = 0
@@ -68,15 +70,33 @@ def generate_MMU_TTBL_process(partition):
     return entries
 
 
-def save_table(entries, filename, varname):
-    with open(filename, "w") as dest:
-        print(f".globl {varname}", file=dest)
-        print(f".section .{varname}_section,\"a\"", file=dest)
-        print(f"{varname}:", file=dest)
-        for value, comment in entries:
-            print(f"\t.word\t0x{value:08X}\t/* {comment} */", file=dest)
-        print(f".end", file=dest)
+def save_table(entries, filename, varname, template_dir):
+    with open(filename, "w") as dest, open(f"{template_dir}/MMU_Table.template.S", "r") as template_file:
+        table_lines = [f"\t.word\t0x{value:08X}\t/* {comment} */" for value, comment in entries]
 
+        file_content = template_file.read()
+        file_content = file_content.replace("/*%%MMU_TABLE_NAME%%*/", varname)
+        file_content = file_content.replace("/*%%MMU_TABLE_CONTENT%%*/", "\n".join(table_lines))
+
+        dest.write(file_content)
+
+
+def make_c_partition_configuration(process_maps, template_dir, autogen_dir):
+    with open(f"{template_dir}/partitions_configuration.template.c", "r") as conf_template_file, \
+        open(f"{template_dir}/partitions_configuration.template.h", "r") as entry_template_file, \
+        open(f"{autogen_dir}/src/partitions_configuration.c", "w") as dest_file:
+        entry_template = entry_template_file.read()
+        file_template = conf_template_file.read()
+
+        extern_def = "\n".join([f"extern const char {process_maps[id]["var_name"]}[];" for id in range(len(process_maps))])
+
+        array_entries = "\n".join([entry_template.replace("/*%%NAME%%*/", f"\"{process_maps[id]["name"]}\"").replace("/*%%TABLE_LOC%%*/", f"&{process_maps[id]["var_name"]}") for id in range(len(process_maps))])
+
+        dest_file.write(\
+            file_template.replace("/*%%EXTERN_REF_TO_TABLES%%*/", extern_def)\
+            .replace("/*%%PARTITIONS_ENTRIES%%*/", array_entries)\
+            .replace("/*%%PARTITIONS_COUNT%%*/", f"{len(process_maps)}"))
+    pass
 
 def get_driver_list(yaml_dict):
     try:
@@ -97,38 +117,41 @@ def get_driver_list(yaml_dict):
     return drivers_dict
     
 
-def main(platform_filename, project_filename, output_dir):
+def main(platform_filename, project_filename, autogen_dir, template_dir):
     with open(platform_filename) as src:
-        pf = yaml.safe_load(src)
+        platform_yaml = yaml.safe_load(src)
     with open(project_filename) as src:
-        pj = yaml.safe_load(src)
+        project_yaml = yaml.safe_load(src)
 
-    MMU_Table_system = generate_MMU_TTBL_system(pf)
-    save_table(MMU_Table_system, f"{output_dir}/_MMU_TTBL_SYS.S", "MMU_TTBL_SYS")
+    MMU_Table_system = generate_MMU_TTBL_system(platform_yaml)
+    save_table(MMU_Table_system, f"{autogen_dir}/src/_MMU_TTBL_SYS.S", "MMU_TTBL_SYS", template_dir)
 
-    drivers = get_driver_list(pf)
+    drivers = get_driver_list(platform_yaml)
 
     process_maps = {}
 
-    for partition in pj["partitions"]:
+    for partition in project_yaml["partitions"]:
         print(f"Partition ID:{partition["id"]} {partition["name"]}: {partition["descr"]}")
         table_name = f"MMU_TTBL_{partition["name"]}"
         entries = generate_MMU_TTBL_process(partition)
-        save_table(entries, f"{output_dir}/_{table_name}.S", table_name)
+        save_table(entries, f"{autogen_dir}/src/_{table_name}.S", table_name, template_dir)
 
-        process_maps[partition["id"]] = table_name
+        process_maps[partition["id"]] = {"name": partition["name"], "var_name": table_name}
 
     # Make headers
+    shutil.copy(f"{template_dir}/partitions_configuration.h", f"{autogen_dir}/include/partitions_configuration.h")
+    make_c_partition_configuration(process_maps, template_dir, autogen_dir)
     
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates headers and linker scripts from config yaml")
     parser.add_argument("platform_config", type=str, help="Path to system config file")
     parser.add_argument("project_config", type=str, help="Path to project config file")
-    parser.add_argument("-o", "--output_dir", required=False, default="./", type=str, help="Path to output dir")
+    parser.add_argument("template_dir", type=str, help="Path to templates dir")
+    parser.add_argument("autogen_dir", type=str, help="Path to output dir")
     args = parser.parse_args()
 
     # main(**vars(args))
-    main(args.platform_config, args.project_config, args.output_dir)
+    main(args.platform_config, args.project_config, args.autogen_dir, args.template_dir)
 
 

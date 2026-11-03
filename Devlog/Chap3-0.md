@@ -116,5 +116,117 @@ So... I'll start with small partitions, set N to 7, build a small Level 1 table 
 
 Also, the smaller table have a smaller memory alignment requirement. So if N=3, the table is 2kB long with a 2kB alignment requirement.
 
+## Let's put this together
 
+I've put up a Python script, `process_config.py`, to process config files and template files into... actual code ! That compiles ! And runs !
 
+First step makes .S files for the tables. From the following template :
+
+```assembly
+.globl /*%%MMU_TABLE_NAME%%*/
+.section ./*%%MMU_TABLE_NAME%%*/_section,"a"
+/*%%MMU_TABLE_NAME%%*/:
+
+/*%%MMU_TABLE_CONTENT%%*/
+
+.end
+```
+
+To the following file :
+
+```assembly
+.globl MMU_TTBL_SYS
+.section .MMU_TTBL_SYS_section,"a"
+MMU_TTBL_SYS:
+
+	.word	0x000155E6	/* OCM, S=1, tex=5, B=1, C=0, apx=0, ap=1 */
+	.word	0x001155E6	/* DDR, S=1, tex=5, B=1, C=0, apx=0, ap=1 */
+	.word	0x002155E6	/* DDR, S=1, tex=5, B=1, C=0, apx=0, ap=1 */
+  /* ... */
+.end
+```
+
+And then make C code that refers to these, from the template :
+
+```C
+#include "partitions_configuration.h"
+
+/*%%EXTERN_REF_TO_TABLES%%*/
+
+const struct hype_partition_descriptor hype_partitions[] = {
+/*%%PARTITIONS_ENTRIES%%*/
+};
+
+const unsigned int hype_partitions_count = /*%%PARTITIONS_COUNT%%*/;
+```
+
+To something like :
+```C
+#include "partitions_configuration.h"
+
+extern const char MMU_TTBL_term[];
+extern const char MMU_TTBL_blinky[];
+extern const char MMU_TTBL_pushy[];
+
+const struct hype_partition_descriptor hype_partitions[] = {
+    {
+        .name = "term",
+        .mmu_table_loc = &MMU_TTBL_term
+    },
+    {
+        .name = "blinky",
+        .mmu_table_loc = &MMU_TTBL_blinky
+    },
+    {
+        .name = "pushy",
+        .mmu_table_loc = &MMU_TTBL_pushy
+    },
+};
+
+const unsigned int hype_partitions_count = 3;
+```
+
+The files are generated into an `autogen` folder, that is referrenced during kernel compilation. 
+
+```bash
+$ tree -d .
+.
+├── conftool
+│   ├── configs
+│   └── templates
+└── kernel
+    ├── arm
+    │   ├── hw
+    │   ├── include
+    │   └── lib
+    ├── autogen
+    │   ├── include
+    │   └── src
+    └── boot
+        ├── include
+        ├── obj
+        └── src
+```
+
+Then, in boot/src/main.c :
+```C
+#include "partitions_configuration.h"
+/*...*/
+int main(){
+    /*...*/
+    _kprint("Partitions (");
+    _kprint_i32dec(hype_partitions_count);
+    _kprint(")\n\r");
+    for(int i = 0; i < hype_partitions_count; i++){
+        _kprint(" - ");
+        _kprint(hype_partitions[i].name);
+        _kprint("\n\r");
+    }
+}
+```
+
+And...
+
+![Partitions from config](./images/Chap_3_0_Partitions.png)
+
+This display (almost first try, loljk) litteraly got my eyes wet.

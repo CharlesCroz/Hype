@@ -14,7 +14,7 @@ static void _kprint_putchar(char c){
     *reg_uart_fifo = c; /* put char in UART TX FIFO*/
 }
 
-void _kprint(char *string){
+void _kprint(const char *string){
     while(*string){
         _kprint_putchar(*string);
         string++;
