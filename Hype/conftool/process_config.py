@@ -81,21 +81,58 @@ def save_table(entries, filename, varname, template_dir):
         dest.write(file_content)
 
 
-def make_c_partition_configuration(process_maps, template_dir, autogen_dir):
-    with open(f"{template_dir}/partitions_configuration.template.c", "r") as conf_template_file, \
-        open(f"{template_dir}/partitions_configuration.template.h", "r") as entry_template_file, \
-        open(f"{autogen_dir}/src/partitions_configuration.c", "w") as dest_file:
-        entry_template = entry_template_file.read()
-        file_template = conf_template_file.read()
+def make_c_partition_configuration(process_maps, template_dir, c_file_content):
+    with open(f"{template_dir}/partitions_configuration.mmu_template.h", "r") as mmu_entry_template_file:
+        mmu_entry_template = mmu_entry_template_file.read()
 
-        extern_def = "\n".join([f"extern const char {process_maps[id]["var_name"]}[];" for id in range(len(process_maps))])
+        extern_def = "\n".join(
+            [f"extern const char {process_maps[id]["var_name"]}[];" 
+            for id in range(len(process_maps))]
+        )
 
-        array_entries = "\n".join([entry_template.replace("/*%%NAME%%*/", f"\"{process_maps[id]["name"]}\"").replace("/*%%TABLE_LOC%%*/", f"&{process_maps[id]["var_name"]}") for id in range(len(process_maps))])
+        mmu_array_entries = "\n".join(
+            [mmu_entry_template.\
+                replace("/*%%NAME%%*/", f"\"{process_maps[id]["name"]}\"").\
+                replace("/*%%TABLE_LOC%%*/", f"{process_maps[id]["var_name"]}")
+            for id in range(len(process_maps))]
+        )
 
-        dest_file.write(\
-            file_template.replace("/*%%EXTERN_REF_TO_TABLES%%*/", extern_def)\
-            .replace("/*%%PARTITIONS_ENTRIES%%*/", array_entries)\
-            .replace("/*%%PARTITIONS_COUNT%%*/", f"{len(process_maps)}"))
+        return c_file_content\
+            .replace("/*%%EXTERN_REF_TO_TABLES%%*/", extern_def)\
+            .replace("/*%%PARTITIONS_ENTRIES%%*/", mmu_array_entries)\
+            .replace("/*%%PARTITIONS_COUNT%%*/", f"{len(process_maps)}")
+
+
+def make_c_scheduler_configuration(schedule, template_dir, c_file_content):
+    with open(f"{template_dir}/partitions_configuration.sched_template.h", "r") as sched_entry_template_file:
+        sched_entry_template = sched_entry_template_file.read()
+
+        period_ms = schedule["period_ms"]
+        cpu0 = schedule["cpu0"]
+
+        cpu0.sort(key=lambda x:x["from_ms"])
+
+        for i, slot in enumerate(cpu0):
+            if slot["from_ms"] >= slot["to_ms"]:
+                raise ConfigError(f"Schedule for cpu0 slot {i} to_ms {slot["to_ms"]} must be strictly greater than from_ms {slot["from_ms"]}")
+        for i in range(len(cpu0) - 1):
+            if cpu0[i]["to_ms"] != cpu0[i+1]["from_ms"]:
+                raise ConfigError(f"Discountinuous schedule for cpu0 between slot[{i}](to_ms={cpu0[i]["to_ms"]}) and slot[{i+1}](to_ms={cpu0[i+1]["from_ms"]})")
+        if cpu0[-1]["to_ms"] != period_ms:
+            raise ConfigError(f"Schedule for cpu0 length {cpu0[-1]["to_ms"]} ms different from scheduler period {period_ms} ms")
+
+
+        sched_array_entries = "\n".join(
+            [sched_entry_template\
+                .replace("/*%%PART_ID%%*/", f"{slot["partition"]}")\
+                .replace("/*%%FROM_MS%%*/", f"{slot["from_ms"]}")\
+                .replace("/*%%TO_MS%%*/", f"{slot["to_ms"]}")
+            for slot in cpu0]
+        )
+
+        return c_file_content\
+            .replace("/*%%SCHEDULING_ENTRIES%%*/", sched_array_entries)\
+            .replace("/*%%SCHEDULING_COUNT%%*/", f"{len(cpu0)}")
 
 
 def get_driver_list(yaml_dict):
@@ -151,9 +188,15 @@ def main(platform_filename, project_filename, autogen_dir, template_dir):
 
         process_maps[partition["id"]] = {"name": partition["name"], "var_name": table_name}
 
+
     # Make headers
     shutil.copy(f"{template_dir}/partitions_configuration.h", f"{autogen_dir}/include/partitions_configuration.h")
-    make_c_partition_configuration(process_maps, template_dir, autogen_dir)
+    with\
+        open(f"{template_dir}/partitions_configuration.template.c", "r") as conf_template_file,\
+        open(f"{autogen_dir}/src/partitions_configuration.c", "w") as dest_file:
+        c_file_content = make_c_partition_configuration(process_maps, template_dir, conf_template_file.read())
+        c_file_content = make_c_scheduler_configuration(project_yaml["schedule"], template_dir, c_file_content)
+        dest_file.write(c_file_content)
     make_MMU_Table_lscript(process_maps, template_dir, autogen_dir)
 
 if __name__ == "__main__":

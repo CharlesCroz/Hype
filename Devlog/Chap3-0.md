@@ -171,15 +171,15 @@ extern const char MMU_TTBL_pushy[];
 const struct hype_partition_descriptor hype_partitions[] = {
     {
         .name = "term",
-        .mmu_table_loc = &MMU_TTBL_term
+        .mmu_table_loc = MMU_TTBL_term
     },
     {
         .name = "blinky",
-        .mmu_table_loc = &MMU_TTBL_blinky
+        .mmu_table_loc = MMU_TTBL_blinky
     },
     {
         .name = "pushy",
-        .mmu_table_loc = &MMU_TTBL_pushy
+        .mmu_table_loc = MMU_TTBL_pushy
     },
 };
 

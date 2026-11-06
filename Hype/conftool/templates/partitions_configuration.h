@@ -10,4 +10,14 @@ struct hype_partition_descriptor
 extern const struct hype_partition_descriptor hype_partitions[];
 extern const unsigned int hype_partitions_count;
 
+struct hype_scheduling_slot {
+    unsigned int partition_id;
+    unsigned int from_ms;
+    unsigned int to_ms;
+};
+
+extern const struct hype_scheduling_slot hype_scheduling[];
+extern const unsigned int hype_scheduling_count;
+
+
 #endif
