@@ -29,6 +29,9 @@ Undefined:					/* Undefined handler */
 	movs	pc, lr
 
 SVCHandler:					/* SWI handler */
+	push	{lr}
+	bl		handle_svc
+	pop 	{lr}
 	movs	pc, lr		/*return to the next instruction after the SWI instruction */
 
 

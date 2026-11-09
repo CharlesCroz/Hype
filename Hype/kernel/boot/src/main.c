@@ -95,6 +95,8 @@ int main()
     gic_activate_irq(62, 3, key1, 0);
     gic_activate_irq(63, 3, key2, 0);
     gic_activate_irq(64, 3, key3, 0);
+
+
     scheduler_status = (struct scheduler_status){
         .current_ms = hype_scheduling[hype_scheduling_count].to_ms - 1,
         .current_slot = hype_scheduling_count - 1
@@ -102,6 +104,9 @@ int main()
     tic_setup(1, scheduler, &scheduler_status);
     // tic_setup(10, increase_tic, 0);
     gic_enable();
+
+    __asm("mov r0, #3\n"
+          "svc 0");
 
 
     return 0;

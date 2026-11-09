@@ -83,3 +83,7 @@ And then, just parameters initialization and function registration! I initualize
 ```
 
 ![Scheduler](./images/Chap_3_1_Scheduling.gif)
+
+## What else do I need
+
+How about having some real partitions. Let's go to [Chapter 3, part 2](./Chap3-2.md)!

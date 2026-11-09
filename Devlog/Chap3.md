@@ -79,5 +79,7 @@ This chapter is actually so huge that I'll split into parts
 
 [Part 0 - Configuration](./Chap3-0.md) 
 
-[Part 0 - Scheduler](./Chap3-1.md) 
+[Part 1 - Scheduler](./Chap3-1.md) 
+
+[Part 2 - xxx](./Chap3-1.md) 
 
