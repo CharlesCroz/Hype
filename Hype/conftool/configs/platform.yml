@@ -88,14 +88,19 @@ memory:
     B: 0
 
 drivers:
-  - name: uart_send
-    id: 0
-  - name : uart_receive
-    id: 1 
-  - name : get_time
-    id: 2 
-  - name : btn_read
-    id: 3 
+  headers:
+    - uart.h
+    # - time.h
+    # - gpio.h
+  callbacks:
+    - name: uart_send
+      id: 0
+    # - name : uart_receive
+    #   id: 1 
+    # - name : get_time
+    #   id: 2 
+    # - name : btn_read
+    #   id: 3 
 
 
 

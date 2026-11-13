@@ -79,3 +79,8 @@ int buffer_pop(struct rolling_buffer *buffer, char *data, unsigned len){
     return len;
 }
 
+int buffer_is_empty(struct rolling_buffer *buffer){
+    return (buffer->head == buffer->tail) && (!buffer->full);
+}
+
+

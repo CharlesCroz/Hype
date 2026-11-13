@@ -14,6 +14,10 @@ Turn the auto-generated code into objects:
 
 `make -C kernel/autogen`
 
+Compile some drivers:
+
+`make -C kernel/drivers`
+
 Turn the auto-generated objects, and kernel code, into boot.elf:
 
 `make -C kernel/boot`

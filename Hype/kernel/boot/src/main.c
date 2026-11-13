@@ -1,52 +1,17 @@
 #include "kprint.h"
 #include "gic.h"
 #include "tic.h"
+#include "syscall.h"
+#include "uart.h"
 #include "partitions_configuration.h"
 #include <stdint.h>
+#include <string.h>
 
 #define REG_LED *((volatile int *)0x40000000)
 
-void mess_table();
-
-void key0(void *arg){
-    (void) arg;
-    _kprint("\033[14;25HKey 0 - Messed with MMU table");
-    REG_LED = REG_LED ^ 0b0001;
-    mess_table();
-}
-
-void key1(void *arg){
-    (void) arg;
-    _kprint("\033[14;25HKey 1 - Write to memory      ");
-    REG_LED = REG_LED ^ 0b0010;
-    *(volatile uint32_t *)(0x00100000) = REG_LED;
-}
-
-void key2(void *arg){
-    (void) arg;
-    _kprint("\033[14;25HKey 2");
-    REG_LED = REG_LED ^ 0b0100;
-}
-
-void key3(void *arg){
-    (void) arg;
-    _kprint("\033[14;25HKey 3");
-    REG_LED = REG_LED ^ 0b1000;
-}
-
-
-void increase_tic(void *param){
-    (void) param;
-    static int tic_count = 0;
-    static int second_count = 0;
-    tic_count += 1;
-    if(tic_count == 100){
-        second_count ++;
-        _kprint("\033[13;25H");
-        _kprint_i32dec(second_count);
-        _kprint("s !");
-        tic_count = 0;
-    }
+void key(void *arg){
+    _kprint("\033[14;25HKey pressed");
+    REG_LED = REG_LED ^ ((int) arg);
 }
 
 struct scheduler_status {
@@ -72,29 +37,26 @@ void scheduler(void *param){
 
 int main()
 {
-    _kprint("\033[2J\033[0;0H");
-    _kprint("===================================\n\r");
-    _kprint("==========   HYPE v0.0   ==========\n\r");
-    _kprint("===================================\n\r");
+    __uart_init();
 
-    
-    _kprint("Partitions (");
-    _kprint_i32dec(hype_partitions_count);
-    _kprint(")\n\r");
+    _kprintf("\033[2J\033[0;0H"
+             "===================================\n\r"
+             "==========   HYPE v0.0   ==========\n\r"
+             "===================================\n\r");
+
+    _kprintf("Partitions (%i)\n\r", hype_partitions_count);
     for(int i = 0; i < hype_partitions_count; i++){
-        _kprint(" - ");
-        _kprint(hype_partitions[i].name);
-        _kprint("\n\r");
+        _kprintf(" - %s\n\r", hype_partitions[i].name);
     }
     
-    _kprint("\n\r\n\r\t\t\tBisous\n\r");
+    _kprintf("\n\r\n\r\t\t\tBisous\n\r");
 
     *((volatile int *)0x40000000) = 15;
 
-    gic_activate_irq(61, 3, key0, 0);
-    gic_activate_irq(62, 3, key1, 0);
-    gic_activate_irq(63, 3, key2, 0);
-    gic_activate_irq(64, 3, key3, 0);
+    gic_activate_irq(61, 3, key, (void *)1);
+    gic_activate_irq(62, 3, key, (void *)2);
+    gic_activate_irq(63, 3, key, (void *)4);
+    gic_activate_irq(64, 3, key, (void *)8);
 
 
     scheduler_status = (struct scheduler_status){
@@ -105,9 +67,15 @@ int main()
     // tic_setup(10, increase_tic, 0);
     gic_enable();
 
-    __asm("mov r0, #3\n"
-          "svc 0");
+    /* Wait for UART TX to be empty before we start messing with things */
+    while(((*(volatile unsigned int *)0xE000102C) & (1<<3)) == 0){
+        /* nop */
+    }
 
+    const char hello[] = "Hello\n\r";
+    __syscall2(SYSCALL_UART_SEND, (void *)hello, (void *)sizeof(hello));
+    __syscall0(1);
+    __syscall0(3);
 
     return 0;
 }

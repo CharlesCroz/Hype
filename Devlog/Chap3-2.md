@@ -60,3 +60,97 @@ What I have in mind, is something like this:
 Seems simple enough, let's see if it works (I'm pretty sure the 3.1 step will be problematic, due to MMU)!
 
 Oh, by the way, let's have a drivers directory tree. It's going to be clean!
+
+```
+kernel/drivers/
+├── export
+│   ├── includes
+│   └── lib
+├── gpio
+├── time
+└── uart
+    ├── include
+    ├── obj
+    └── src
+```
+
+And the config file evolved a bit :
+
+```yaml
+drivers:
+  headers:
+    - uart.h
+    # - time.h
+    # - gpio.h
+  callbacks:
+    - name: uart_send
+      id: 0
+    # - name : uart_receive
+    #   id: 1 
+    # - name : get_time
+    #   id: 2 
+    # - name : btn_read
+    #   id: 3 
+```
+
+And it generates thing like these...
+```c
+#include "syscall.h"
+#include "uart.h"
+
+
+const int (*__syscall_callbacks[])(void *, void *) = {
+    (syscall_callback) uart_send,
+
+};
+const int __syscall_callbacks_count = 1;
+```
+And...
+```c
+#ifndef HYPE_SYSCALL_ID_PROT
+#define HYPE_SYSCALL_ID_PROT
+
+#define SYSCALL_UART_SEND 0
+
+#endif
+```
+
+These functions are registered into a nicely decorated handler :
+```c
+__attribute__ ((target("general-regs-only"), interrupt("SWI"))) 
+int handle_syscall(int SYSCALL_ID, void *p1, void *p2){
+    int is_defined;
+    
+    is_defined = (SYSCALL_ID < __syscall_callbacks_count) && (__syscall_callbacks[SYSCALL_ID] != 0);
+
+    if(is_defined){
+        _kprintf("SYSCALL_ID:%d\n\r", SYSCALL_ID);
+        return __syscall_callbacks[SYSCALL_ID](p1, p2);
+    }else{
+        _kprintf("SYSCALL_ID:%d-undef\n\r", SYSCALL_ID);
+    }
+    
+    return -1;
+};
+```
+
+And how do you call the handler you may ask ? Well, simply (depending on your callback count of parameters) :
+```c
+int __syscall0(int SYSCALL_ID);
+int __syscall1(int SYSCALL_ID, void *p1);
+int __syscall2(int SYSCALL_ID, void *p1, void *p2);
+```
+
+For instance :
+```c
+    const char hello[] = "Hello\n\r";
+    __syscall2(SYSCALL_UART_SEND, (void *)hello, (void *)sizeof(hello));
+```
+
+So, from this `__syscall2` call, we climb up to the handler calling `__syscall_callbacks[0]`, aka `uart_send` with the arguments, casted as `void *` for genericity. Anyway, the arguments will be passed as registers `r0` and `r1`, as per arm function call convention. And then, from the drivers, we have this :
+```c
+int uart_send(char *text, unsigned int n_char);
+```
+Bim, profit !
+
+Some makefiles still misbehave a bit and don't take into account some recently compiled artifacts... make clean and make again does the trick !

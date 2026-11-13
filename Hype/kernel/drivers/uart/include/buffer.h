@@ -47,4 +47,12 @@ int buffer_push(struct rolling_buffer *buffer, const char *data, unsigned len);
  */
 int buffer_pop(struct rolling_buffer *buffer, char *data, unsigned len);
 
+/**
+ * @brief Return non-zero iff buffer is empty
+ * 
+ * @param buffer 
+ * @return int 
+ */
+int buffer_is_empty(struct rolling_buffer *buffer);
+
 #endif

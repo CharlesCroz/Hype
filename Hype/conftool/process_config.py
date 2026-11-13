@@ -141,17 +141,19 @@ def get_driver_list(yaml_dict):
     except KeyError as e:
         raise ConfigError(f"Platform Yaml malformed.")
 
-    drivers_dict = {}
-    for e in raw_drivers:
+    callbacks = {}
+    for e in raw_drivers["callbacks"]:
         id = e["id"]
         name = e["name"]
-        if id in drivers_dict.keys():
+        if id in callbacks.keys():
             raise ConfigError(f"Repeated driver ID {id}")
-        elif name in drivers_dict.values():
+        elif name in callbacks.values():
             raise ConfigError(f"Repeated driver name {name}")
-        drivers_dict[id] = name
+        callbacks[id] = name
 
-    return drivers_dict
+    headers = raw_drivers["headers"]
+
+    return callbacks, headers
 
 
 def make_MMU_Table_lscript(process_maps, template_dir, autogen_dir):
@@ -164,7 +166,40 @@ def make_MMU_Table_lscript(process_maps, template_dir, autogen_dir):
             .replace("/*%%SECTION_NAME%%*/", process_maps[id]["var_name"])
             for id in range(len(process_maps))
         ]))
-    pass
+
+
+def make_driver_config(callbacks, headers, template_dir, autogen_dir):
+    with open(f"{template_dir}/syscall_entries.entry_template.c", "r") as entry_template_file, \
+        open(f"{template_dir}/syscall_entries.template.c", "r") as template_file, \
+        open(f"{autogen_dir}/src/syscall_entries.c", "w") as dest_file:
+
+        entry_template = entry_template_file.read()
+        template = template_file.read()
+
+        entries = "".join([
+            entry_template.replace("/*%%FUNCTION%%*/", callbacks[id])
+            for id in range(len(callbacks))
+        ])
+
+        includes = "\n".join([f"#include \"{f}\"" for f in headers])
+
+        dest_file.write(template\
+                        .replace("/*%%CALLBACK_LIST%%*/", entries)\
+                        .replace("/*%%CALLBACK_COUNT%%*/", f"{len(callbacks)}")\
+                        .replace("/*%%CALLBACK_INCLUDES%%*/", includes))
+
+
+def make_syscall_ID(callbacks, template_dir, autogen_dir):
+    with open(f"{template_dir}/syscall_ID.template.h", "r") as template_file, \
+        open(f"{autogen_dir}/include/syscall_ID.h", "w") as dest_file:
+
+        template = template_file.read()
+
+        entries = "\n".join([f"#define SYSCALL_{callbacks[id].upper()} {id}"
+            for id in range(len(callbacks))
+        ])
+
+        dest_file.write(template.replace("/*%%CALLBACK_DEFINES%%*/", entries))
 
 
 def main(platform_filename, project_filename, autogen_dir, template_dir):
@@ -176,7 +211,7 @@ def main(platform_filename, project_filename, autogen_dir, template_dir):
     MMU_Table_system = generate_MMU_TTBL_system(platform_yaml)
     save_table(MMU_Table_system, f"{autogen_dir}/src/_MMU_TTBL_SYS.S", "MMU_TTBL_SYS", template_dir)
 
-    drivers = get_driver_list(platform_yaml)
+    driver_callbacks, driver_headers  = get_driver_list(platform_yaml)
 
     process_maps = {}
 
@@ -198,6 +233,9 @@ def main(platform_filename, project_filename, autogen_dir, template_dir):
         c_file_content = make_c_scheduler_configuration(project_yaml["schedule"], template_dir, c_file_content)
         dest_file.write(c_file_content)
     make_MMU_Table_lscript(process_maps, template_dir, autogen_dir)
+
+    make_driver_config(driver_callbacks, driver_headers, template_dir, autogen_dir)
+    make_syscall_ID(driver_callbacks, template_dir, autogen_dir)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates headers and linker scripts from config yaml")

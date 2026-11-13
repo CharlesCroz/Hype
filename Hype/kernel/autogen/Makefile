@@ -1,5 +1,9 @@
 ###########################
 
+### Kernel includes
+K_INC := ../boot/include
+D_INC := ../drivers/export/include
+
 ### OBJS
 SRC := ./src
 OBJ := ./obj
@@ -18,7 +22,7 @@ TARGETS := $(S_OBJS) $(C_OBJS)
 
 # compiler and linker flags
 COMMON_FLAGS := -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard
-export CFLAGS = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC)
+export CFLAGS = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC) -I$(K_INC) -I$(D_INC)
 
 #################
 all: $(TARGETS)

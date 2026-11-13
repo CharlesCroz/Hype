@@ -1,0 +1,6 @@
+#ifndef HYPE_SYSCALL_ID_PROT
+#define HYPE_SYSCALL_ID_PROT
+
+/*%%CALLBACK_DEFINES%%*/
+
+#endif

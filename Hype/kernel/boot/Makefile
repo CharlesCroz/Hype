@@ -4,6 +4,14 @@ TARGET = boot
 
 
 ###########################
+## Drivers
+EXPORT_DIR ?= ../drivers/export/
+EXPORT_LIB := $(EXPORT_DIR)/lib/
+EXPORT_INC := $(EXPORT_DIR)/include/
+EXPORT_OBJ := $(wildcard $(EXPORT_LIB)/*.a)
+
+
+###########################
 ## Autogen objects
 
 ### Folders 
@@ -34,12 +42,14 @@ C_OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(C_SRCS))
 S_SRCS := $(wildcard $(SRC)/*.S)
 S_OBJS := $(patsubst $(SRC)/%.S, $(OBJ)/%.o, $(S_SRCS))
 
+LIBS  := $(wildcard $(OBJ)/*.a)
+
 TARGET := $(OBJ)/$(TARGET)
 
 ## compiler and linker flags
 COMMON_FLAGS := -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard
-export CFLAGS  = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC) -I$(AUTOGEN_INC)
-export LDFLAGS = $(COMMON_FLAGS) -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,lscript.ld -Lobj -L$(AUTOGEN_INC)
+export CFLAGS  = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC) -I$(AUTOGEN_INC) -I$(EXPORT_INC)
+export LDFLAGS = $(COMMON_FLAGS) -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,lscript.ld -Lobj -L$(AUTOGEN_INC) -L$(EXPORT_LIB)
 
 #################
 ## Rules
@@ -53,7 +63,7 @@ $(OBJ)/%.o:$(SRC)/%.S
 	arm-none-eabi-gcc -c $(CFLAGS) -o $@ $<
 
 $(TARGET).elf: $(C_OBJS) $(S_OBJS)
-	arm-none-eabi-gcc $(LDFLAGS) -o $@ $(C_OBJS) $(S_OBJS) $(AUTOGEN_OBJS) -Wl,--start-group,-lgcc,-lc,--end-group
+	arm-none-eabi-gcc $(LDFLAGS) -o $@ $(C_OBJS) $(S_OBJS) $(AUTOGEN_OBJS) $(EXPORT_OBJ) $(LIBS) -Wl,--start-group,-lgcc,-lc,--end-group
 
 clean:
 	rm -f **/*.o *~ **/*.elf

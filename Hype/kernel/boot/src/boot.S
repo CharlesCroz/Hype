@@ -6,7 +6,6 @@
 
 .section .boot,"ax"
 _boot:
-@ Todo : Configure FIQ/IRQ stack, some day
 
 @ SCTLR : Disable MMU (bit 0), data cache (bit 2), instruction cache (bit 12)  
 	mrc	p15, 0, r0, c1, c0, 0
@@ -65,6 +64,24 @@ _boot_invalidate_cache_wayloop:
 	mvn	r0,#0					@ All ones
 	mcr	p15,0,r0,c3,c0,0		@ Write DACR
 
+@ Set FIQ/IRQ Stack pointers
+	mrs	r1, cpsr
+
+	ldr r0, =__fiq_stack
+	bic r2, r1, #0x1F
+	orr r2, r2, #0b10001
+	msr cpsr_c, r2
+	mov sp, r0
+
+	ldr r0, =__irq_stack
+	bic r2, r1, #0x1F
+	orr r2, r2, #0b10010
+	msr cpsr_c, r2
+	mov sp, r0
+
+	@resume Supervisor mode
+	msr cpsr_c, r1
+
 @ Enable MMU
 	mrc	p15, 0, r0, c1, c0, 0
 	orr	r0, r0, #1 
@@ -76,7 +93,7 @@ _boot_invalidate_cache_wayloop:
     msr cpsr_x, r1 /* _x to update the fcking secod byte of CPSR */
 
 @ Set main return address to _exit
-	ldr sp, =_stack
+	ldr sp, =__supervisor_stack
 	ldr lr, =_exit
 	b main
 	

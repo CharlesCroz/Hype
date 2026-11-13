@@ -24,7 +24,8 @@ struct handler_table_entry{
 #define IRQ_HANDLERS_COUNT 256
 struct handler_table_entry IRQ_HANDLERS_TABLE[IRQ_HANDLERS_COUNT]= { 0 };
 
-void handle_irq(){
+__attribute__ ((target("general-regs-only"), interrupt("IRQ"))) 
+void handle_irq() {
     volatile int irq_id;
     /* Get IRQ ID*/
     irq_id = *(volatile int *)(XPAR_SCUGIC_0_CPU_BASEADDR + GIC_ICCIAR_OFFSET);
@@ -37,9 +38,6 @@ void handle_irq(){
         /* Clear IRQ ID*/
         *(volatile int *)(XPAR_SCUGIC_0_CPU_BASEADDR + GIC_ICCEOIR_OFFSET) = irq_id;
     }
-    // _kprint("IRQ ");
-    // _kprint_u32dec(irq_id);
-    // _kprint(" triggered and cleared\n\r");
 }
 
 void gic_enable(){

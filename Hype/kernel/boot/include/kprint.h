@@ -6,4 +6,6 @@ void _kprint_i32dec(int val);
 void _kprint_u32dec(unsigned int val);
 void _kprint_u32hex(unsigned int val);
 
+void _kprintf(const char *pattern, ...);
+
 #endif
