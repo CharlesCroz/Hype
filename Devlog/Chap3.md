@@ -81,5 +81,7 @@ This chapter is actually so huge that I'll split into parts
 
 [Part 1 - Scheduler](./Chap3-1.md) 
 
-[Part 2 - xxx](./Chap3-1.md) 
+[Part 2 - Elf or not](./Chap3-2.md) 
+
+[Part 3 - Elf](./Chap3-3.md) 
 

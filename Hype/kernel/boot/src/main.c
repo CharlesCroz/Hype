@@ -4,14 +4,13 @@
 #include "syscall.h"
 #include "uart.h"
 #include "partitions_configuration.h"
-#include <stdint.h>
-#include <string.h>
+#include "elf.h"
 
 #define REG_LED *((volatile int *)0x40000000)
 
 void key(void *arg){
-    _kprint("\033[14;25HKey pressed");
-    REG_LED = REG_LED ^ ((int) arg);
+    _kprintf("Key %d pressed\n\r", (int) arg);
+    REG_LED = REG_LED ^ (1 << (int) arg);
 }
 
 struct scheduler_status {
@@ -29,10 +28,47 @@ void scheduler(void *param){
             sched_status->current_slot = 0;
             sched_status->current_ms = 0;
         }
-        _kprint("\033[13;25H");
-        _kprint(hype_partitions[hype_scheduling[sched_status->current_slot].partition_id].name);
-        _kprint("  ");
+        // _kprintf("\033[13;25H%s   ", hype_partitions[hype_scheduling[sched_status->current_slot].partition_id].name);
     }
+}
+
+void print_elf_header(const struct elf_header *header){
+    _kprintf("ELF file located at 0x%p\n\r", (unsigned int)header);
+    _kprintf("e_ident[0:3] magic [0x%x]%c%c%c\n\r", (int)header->e_ident[0], header->e_ident[1], header->e_ident[2], header->e_ident[3]);
+    _kprintf("e_ident[4] class   0x%x (1:32bits, 2:64bits)\n\r", (int)header->e_ident[4]);
+    _kprintf("e_type             0x%x\n\r", (int)header->e_type);
+    _kprintf("e_machine          0x%x\n\r", (int)header->e_machine);
+    _kprintf("Program e_phoff    0x%p\n\r", (int)header->e_phoff);
+    _kprintf("Section e_shoff    0x%p\n\r", (int)header->e_shoff);
+    _kprintf("e_shstrndx         0x%p\n\r", (int)header->e_shstrndx);
+    
+
+    const struct elf_pheader *pheaders = (const struct elf_pheader *)((unsigned int)header + (unsigned int)header->e_phoff);
+
+    for(int i = 0 ; i < header->e_phnum; i++){
+        _kprintf("Program header entry %i\n\r", i);
+        _kprintf("\tp_type   0x%p",     pheaders[i].p_type);
+        _kprintf("  p_offset 0x%p\n\r", pheaders[i].p_offset);
+        _kprintf("\tp_vaddr  0x%p",     pheaders[i].p_vaddr);
+        _kprintf("  p_paddr  0x%p\n\r", pheaders[i].p_paddr);
+        _kprintf("\tp_filesz 0x%p",     pheaders[i].p_filesz);
+        _kprintf("  p_memsz  0x%p\n\r", pheaders[i].p_memsz);
+        _kprintf("\tp_flags  0x%p",     pheaders[i].p_flags);
+        _kprintf("  p_align  0x%p\n\r", pheaders[i].p_align);
+    }
+
+    const struct elf_sheader *sheaders = (const struct elf_sheader *)((unsigned int)header + (unsigned int)header->e_shoff);
+    const char *section_names = (char *)((uint32_t)header + (uint32_t)sheaders[header->e_shstrndx].sh_offset);
+    _kprintf("Section names at 0x%p\r\n", sheaders[header->e_shstrndx].sh_offset);
+
+    for(int i = 0 ; i < header->e_shnum; i++){
+        _kprintf("Section header %i : %s", 
+                i, &section_names[sheaders[i].sh_name]);
+        _kprintf("\tsh_type 0x%x, sh_size 0x%x, sh_offset 0x%x\n\r", 
+            sheaders[i].sh_type, sheaders[i].sh_size, sheaders[i].sh_offset);
+    }
+
+
 }
 
 int main()
@@ -49,14 +85,14 @@ int main()
         _kprintf(" - %s\n\r", hype_partitions[i].name);
     }
     
-    _kprintf("\n\r\n\r\t\t\tBisous\n\r");
+    _kprintf("\n\n\rSyscall tests\r\n");
 
     *((volatile int *)0x40000000) = 15;
 
-    gic_activate_irq(61, 3, key, (void *)1);
-    gic_activate_irq(62, 3, key, (void *)2);
-    gic_activate_irq(63, 3, key, (void *)4);
-    gic_activate_irq(64, 3, key, (void *)8);
+    gic_activate_irq(61, 3, key, (void *)0);
+    gic_activate_irq(62, 3, key, (void *)1);
+    gic_activate_irq(63, 3, key, (void *)2);
+    gic_activate_irq(64, 3, key, (void *)3);
 
 
     scheduler_status = (struct scheduler_status){
@@ -75,7 +111,9 @@ int main()
     const char hello[] = "Hello\n\r";
     __syscall2(SYSCALL_UART_SEND, (void *)hello, (void *)sizeof(hello));
     __syscall0(1);
-    __syscall0(3);
+
+    struct elf_header *header = (struct elf_header *) 0x100000;
+    print_elf_header(header);
 
     return 0;
 }

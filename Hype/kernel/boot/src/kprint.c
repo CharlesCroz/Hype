@@ -55,7 +55,7 @@ void _sprint_i32dec(char *buff, int val){
     _sprint_u32dec(buff, val);
 }
 
-void _sprint_u32hex(char *buff, unsigned int val){
+void _sprint_p(char *buff, unsigned int val){
     static const char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     int shift;
 
@@ -64,6 +64,31 @@ void _sprint_u32hex(char *buff, unsigned int val){
         shift = shift - 4;
         *(buff++) = hex[(val >> shift) & 0xF];
     }
+    *buff = '\0';
+
+    return;
+}
+
+void _sprint_u32hex(char *buff, unsigned int val){
+    static const char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    int digit_count = 0;
+    unsigned char digits[10];
+
+    while(val){
+        digits[digit_count] = val & 0xF;
+        val = val >> 4;
+        digit_count++;
+    }
+
+    if(digit_count == 0){
+        *(buff++) = '0';
+    }else{
+        while(digit_count){
+            digit_count--;
+            *(buff++) = hex[digits[digit_count]];
+        }
+    }
+
     *buff = '\0';
 
     return;
@@ -88,21 +113,31 @@ void _kprintf(const char *pattern, ...){
                     _sprint_u32hex(number_buffer, va_arg(args, unsigned int));
                     at_n = number_buffer;
                     break;
-                    case 'u':
+                case 'p':
+                    _sprint_p(number_buffer, va_arg(args, unsigned int));
+                    at_n = number_buffer;
+                    break;
+                case 'u':
                     _sprint_u32dec(number_buffer, va_arg(args, unsigned int));
                     at_n = number_buffer;
                     break;
-                    case 'd':
-                    case 'i':
+                case 'd':
+                case 'i':
                     _sprint_i32dec(number_buffer, va_arg(args, int));
                     at_n = number_buffer;
                     break;
                 case 's':
                     at_n = va_arg(args, const char *);
                     break;
+                case 'c':
+                    number_buffer[0] = (char)(va_arg(args, int));
+                    number_buffer[1] = '\0';
+                    at_n = number_buffer;
+                    break;
                 case '%':
                     number_buffer[0] = '%';
                     number_buffer[1] = '\0';
+                    at_n = number_buffer;
                     break;
                 
                 default:

@@ -154,3 +154,7 @@ int uart_send(char *text, unsigned int n_char);
 Bim, profit !
 
 Some makefiles still misbehave a bit and don't take into account some recently compiled artifacts... make clean and make again does the trick !
+
+## Yes but
+
+That being said, we were talking about elf files. So... See [Chapter 3, part 3](./Chap3-3.md)!
