@@ -81,3 +81,5 @@ And comparing to the signature of buffer_init
 int buffer_init(struct rolling_buffer *buffer, char *data, unsigned len);
 ```
 R0 (decimal 35232) maps to the struct rolling_buffer pointer, and r1 (decimal 35232 + 20 0x89b4!) to the data. I could read the trash that is there and get the last 1024 printed bytes. But well deal with hacking the kernel later, prehaps? 
+
+But it does confirm the "memory used to store variables" theory. I like that. What remains to be done? Unfortunately, everything!
