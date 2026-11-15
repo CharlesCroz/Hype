@@ -16,15 +16,15 @@ Basically, when an interrupt/exception is triggeredm some registers are saved/ba
 |0x18|IRQ|IRQ|I=1|`SUBS PC, R14, #4` Next instruction|
 |0x1C|FIQ|FIQ|F=1, I=1|`SUBS PC, R14, #4` Next instruction|
 
-What I intended to do : use Xilinx functions to register a function that change the LEDs pattern when I hit a button. Did it work ? Obviously not. 
+What I intended to do : use Xilinx functions to register a function that change the LEDs pattern when I hit a button. Did it work? Obviously not. 
 
-And well... ironically, looking more into the instruction being run at startup, I decided to go for boot code instead of interrupts. Because after all.... Boot code is the first thing that runs !
+And well... ironically, looking more into the instruction being run at startup, I decided to go for boot code instead of interrupts. Because after all.... Boot code is the first thing that runs!
 
 ## Reworking the base
 
-So... Best way to understand is to do, right ?
+So... Best way to understand is to do, right?
 
-So here we are, makeing a boot.S that configures the CPU and CP15, initializes stack pointer and link return value, and here we go !
+So here we are, makeing a boot.S that configures the CPU and CP15, initializes stack pointer and link return value, and here we go!
 
 Oh, and I made a dummy exception vector table (for now).
 
@@ -64,18 +64,18 @@ void _kprint(char *string){
 }
 ```
 
-The compiler used the keywork static to treat `_kprint_putchar` as an inlined function. Who am I to judge ? Actually, it' s just a few instructions, often repeated, so I'm glad it saved the jumps.
+The compiler used the keywork static to treat `_kprint_putchar` as an inlined function. Who am I to judge? Actually, it' s just a few instructions, often repeated, so I'm glad it saved the jumps.
 
-## Yes, but buttons iterrupts ?
+## Yes, but buttons iterrupts?
 
 So, button on the board are connected to the PL, then to the GIC lines 61 to 64. According to UG-585, that means I have to enable configure "something" in registers ICDICFR3[31:30] for button 0 at IRQ ID 61, and ICDIFR4[1:0], ICDIFR4[3:2], ICDIFR4[5:4] for buttons 1, 2, 3 at IRQ ID 62, 63, 64.
 
-The two bytes ? No idea. Oh, and this :
+The two bytes? No idea. Oh, and this :
 > Targeting the CPU is done by the ICDIPTR [23:8] registers. The sensitivity of each SPI interrupt must be programmed to match those listed in Table 1, PS and PL Shared Peripheral Interrupts (SPI). The sensitivity is programmed using the ICDICFR [5:2] registers.
 
 Xilinx doc is... well, it is what it is. **But** they mention the GIC component, pl390. Let's check the [online documentation](https://support.arm.com/documentation/ddi0416/b/) then....
 
-Oh, but Altera did something (see [Resources](../Resources/)) ! Apero is calling, but let's try something.
+Oh, but Altera did something (see [Resources](../Resources/))! Apero is calling, but let's try something.
 
 ## SCU, GIC, CPSR
 
@@ -91,7 +91,7 @@ So, to actually have your CPU recieve interrupts, you have to :
   - Set the CPU to relay the interrupt (ICDIPTRn - 8 bits)
   - Set the sensitivity (edge = 1 or active = 0, in a ICDICFRn register - 2 bits, but only the higher bit has to be set)
 
-Oh, and you can configure it somewhere to send FIQ or IRQ, but... Not today !
+Oh, and you can configure it somewhere to send FIQ or IRQ, but... Not today!
 
 Good, now you just have to process it.
 ```assembly
@@ -107,17 +107,17 @@ To process it, it's actually pretty straightforward :
 - Handle th sh*t out of it (I... printed something...)
 - Write the interrupt ID to ICCEOIR register.
 
-Recompile, flash, profit !
+Recompile, flash, profit!
 
 ![Boot and interrups](./images/Chap1_interrupts.png)
 
 I know, the code is dirty, but for now I'm trying to make sense of things. Oh, and I'm pretty sure the blocking _kprint are taking most of the execution time. I guess profiling and other testing tools should be comming next.
 
-But now that I have PL interrupts, and probably all the other ones though I didn't try them (should I make a code that purposedly hit an undefined instruction to trigger the associated exception ? Definitely ! Will I ? We'll see), next step is... Timers !
+But now that I have PL interrupts, and probably all the other ones though I didn't try them (should I make a code that purposedly hit an undefined instruction to trigger the associated exception? Definitely! Will I? We'll see), next step is... Timers!
 
 ## Timed interrupts
 
-So, from some official Xilinx documentation (rare enough to be mentionned, ain't it), I found what I was looking for !
+So, from some official Xilinx documentation (rare enough to be mentionned, ain't it), I found what I was looking for!
 
 GIC has a private timer for each CPU. It's plugged to GID interrupt line 29, and it's easy to configure.
 
@@ -135,12 +135,12 @@ The right callback architecture, prescaler set to max 256, using xparameters.h `
 void tic_setup(int ms_duration, void (*callback)(void *), void *param);
 ```
 
-I set ms_duration to 10 ms, made a callback that counts 100 tics for a glorious second, and voila ! 
+I set ms_duration to 10 ms, made a callback that counts 100 tics for a glorious second, and voila! 
 
 The gif is ugly, blame it on ffmpeg... Check the [avi file](./images/Timer.avi)...
 
 ![](./images/Timer.gif)
 
-Another essential brick for the wall... hem... for the Hypervisor !
+Another essential brick for the wall... hem... for the Hypervisor!
 
-Next ? A real driver using UART interrupts to go beyong the 64 bytes ? I'll keep that in mind. First, another look ath the MMU !
+Next? A real driver using UART interrupts to go beyong the 64 bytes? I'll keep that in mind. First, another look ath the MMU!

@@ -20,7 +20,7 @@ dow -data {./kernel/boot/obj/boot.elf} 0x100000
 con
 ```
 
-And just casting that address as apointer to a header struct, I get some display !
+And just casting that address as apointer to a header struct, I get some display!
 
 ```c
 void print_elf_header(struct elf_header *header){
@@ -40,11 +40,11 @@ int main(){
 }
 ```
 
-And that... works !
+And that... works!
 
 ![ELF Header](./images/Chap_3_3_ELF0.png)
 
-So, let's check program and sections headers, and voila !
+So, let's check program and sections headers, and voila!
 
 ![ELF Program and Section Headers](./images/Chap_3_3_ELF1.png)
 
@@ -64,5 +64,20 @@ So, we'll ignore the first entry, and compare the content of program entry 1 to 
 
 So, looks bright! The loaded section is the same as what's in the RAM! I thought they would be some difference, but nope! Good! The rest... I don't know if xsdb zeroed it and it got modified during the execution, or if it comes from startup ram noise. Meh, the first part is actually already a victory! 
 
+One particular section of the non-zero section is that 1024 block at 0x000089b4... My uart_send buffer data? 
 
-
+Looking at the assembly of __uart_init() :
+```assembly
+00000d7c <__uart_init>:
+    movw    r0, #35232      @ 0x89a0
+    push    {r4, lr}
+    movt    r0, #0
+    mov     r2, #1024       @ 0x400
+    add     r1, r0, #20
+    bl      df0 <buffer_init>
+```
+And comparing to the signature of buffer_init
+```c
+int buffer_init(struct rolling_buffer *buffer, char *data, unsigned len);
+```
+R0 (decimal 35232) maps to the struct rolling_buffer pointer, and r1 (decimal 35232 + 20 0x89b4!) to the data. I could read the trash that is there and get the last 1024 printed bytes. But well deal with hacking the kernel later, prehaps? 

@@ -16,7 +16,7 @@ Useful **xsdb** command : `targets -target-properties` (to understand what targe
 
 ## Detour near MMU
 
-After playing a little with **objdump** on the generated Kernel.elf and a generated fsbl.elf somewhere in the Vitis project, I noticed that the linker script places the Kernel code to DDR (0x10_0000) while the fsbl places it in the OCM (On Chip Memory, 0x0). First time playing with *lscript.ld* linker script was a success !
+After playing a little with **objdump** on the generated Kernel.elf and a generated fsbl.elf somewhere in the Vitis project, I noticed that the linker script places the Kernel code to DDR (0x10_0000) while the fsbl places it in the OCM (On Chip Memory, 0x0). First time playing with *lscript.ld* linker script was a success!
 
 More fun with **xsdb**, in particular `mr`, `mw` (Memory Read/Write), `rrd`, `rwr` (Register ReaD/WRite), et assembler `mcr` (Move to Coprocessor from Register) and `mrc` (Move to Register from Coprocessor), using an online compiling tool to get the hex value of the instruction from assembler.
 
@@ -139,16 +139,16 @@ New options:
 - `-Wl,-build-id=none` : *Request the creation of a ".note.gnu.build-id" ELF note section or a ".buildid" COFF section. [...] Passing "none" for style disables the setting from any "--build-id" options earlier on the command line.*
 - `-specs` : *Process  file  after  the  compiler  reads  in  the  standard  specs file, in order to override the defaults which the gcc driver program uses when determining what switches to pass to cc1, cc1plus, as, ld, etc.  More than one -specs=file can be specified on the command line, and they are processed in order, from left to right.*
 - `-Wl,-T` + `-Wl,../src/lscript.ld ` : *Use  **scriptfile**  as  the  linker script.*
-- `-Lxxx` : FINALLY ! `.o` and `.d` 
+- `-Lxxx` : FINALLY! `.o` and `.d` 
 - `-Wl,--start-group,-lxil,-lgcc,-lc,--end-group` : *The archives should be a list of archive files.  They may be either explicit file names, or -l options. The specified archives are searched repeatedly until no new undefined references are created.  Normally, an archive is searched only once in the order that it is specified on the command line.  If a symbol in that  archive  is needed  to resolve an undefined symbol referred to by an object in an archive that appears later on the command line, the linker would not be able to resolve that reference.  By grouping the archives, they will all be searched repeatedly until all possible references are resolved. Using this option has a significant performance cost.  It is best to use it only when there are unavoidable circular references between two or more archives.*
 
-Well. That's good! I'm glad I took the time to look at this, and found the .o related to all the low level functions specific to the target. Now that's a lot of ingredients, lots of absolute paths. But it's getting a bit clearer ! What is where, when is what used.
+Well. That's good! I'm glad I took the time to look at this, and found the .o related to all the low level functions specific to the target. Now that's a lot of ingredients, lots of absolute paths. But it's getting a bit clearer! What is where, when is what used.
 
 ## Mon make à moi
 
-So, let's set asside all the .o, .h, lscript.ld, Xilinx.spec and here we go ! Take an old Makefile and... 
+So, let's set asside all the .o, .h, lscript.ld, Xilinx.spec and here we go! Take an old Makefile and... 
 
-Here it is ! [Hype has a folder](../Hype/) ! 
+Here it is! [Hype has a folder](../Hype/)! 
 
 ```
 ===================================

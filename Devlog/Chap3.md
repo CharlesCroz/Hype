@@ -1,6 +1,6 @@
 # Chapitre 3 - Hype, version 0
 
-Is this it ? Probably. Now things have to get real, and I have to make... **Hyp-0** (Hype v0, and it sounds like hypo- which in greek means under... because it will be under-?-ing) ! Single core, basic drivers (uart send/receive, get system uptime), shared memories but no synchronization (race conditions lottery incoming).
+Is this it? Probably. Now things have to get real, and I have to make... **Hyp-0** (Hype v0, and it sounds like hypo- which in greek means under... because it will be under-?-ing)! Single core, basic drivers (uart send/receive, get system uptime), shared memories but no synchronization (race conditions lottery incoming).
 
 Bonus : some unit tests in kernel HW independant functions, better formatted code ([uncrustify](https://github.com/uncrustify/uncrustify)).
 
@@ -22,21 +22,21 @@ Here, no. It's going to be a straightforward deterministic compile time set way.
 
 ![Time partitioning](./charts/Architecture-Sequencing.drawio.png)
 
-At compile time, we define when each process (or partition) is going to run. Oh, and while we're doing nothing, I think Cortex-A9 cores have WFE/WFI (Wait For Event/Interrupt) instructions that help save power. Not that it's an issue here, but it feels like a nice to have ?
+At compile time, we define when each process (or partition) is going to run. Oh, and while we're doing nothing, I think Cortex-A9 cores have WFE/WFI (Wait For Event/Interrupt) instructions that help save power. Not that it's an issue here, but it feels like a nice to have?
 
 So, this is not smart, and if in the middle of the previous example process C is done or starved in the middle of its slots, too bad, B can't start early.
 
 ### Interacting with the kernel (drivers, IPCs)
 
-Well... That is... For now, I just have in mind a couple of drivers that return uptime (granularity TBD), push text to the UART send buffer, pop text from the UART receive buffer. I guess I'll have to implement three "system calls", and proper return codes... and some errno mecanism... Oh dear !
+Well... That is... For now, I just have in mind a couple of drivers that return uptime (granularity TBD), push text to the UART send buffer, pop text from the UART receive buffer. I guess I'll have to implement three "system calls", and proper return codes... and some errno mecanism... Oh dear!
 
 ![System calls](./charts/Architecture-System%20Calls%20Example.drawio.png)
 
-When a process use a `hype_xxx` function (declared in an upcoming header file, implementend in an upcoming static library file), it gets translated to the corresponding system call, which throws a SWI (SoftWare Interrupt) to go to kernel mode. The SWI handler checks if the process has the correct permission (according to configuration of the hypervisor), calls the corresponding system call handler which performs the task, and.... voila ? 
+When a process use a `hype_xxx` function (declared in an upcoming header file, implementend in an upcoming static library file), it gets translated to the corresponding system call, which throws a SWI (SoftWare Interrupt) to go to kernel mode. The SWI handler checks if the process has the correct permission (according to configuration of the hypervisor), calls the corresponding system call handler which performs the task, and.... voila? 
 
 ### Side note
 
-It took me some time to write these. I have no idea how long this will take to make a working Hyp-0 !
+It took me some time to write these. I have no idea how long this will take to make a working Hyp-0!
 
 ## Configuration
 
@@ -61,9 +61,9 @@ Then scripts will :
 
 ## Compilation
 
-Now, it's not just about a Kernel. So we'll have to compile the kernel and a static library for system calls, then compile our partitions into .elf files (so we can check things, I guess), then link the kernel and the partitions together !
+Now, it's not just about a Kernel. So we'll have to compile the kernel and a static library for system calls, then compile our partitions into .elf files (so we can check things, I guess), then link the kernel and the partitions together!
 
-Easy ! Hahaha, help me !
+Easy! Hahaha, help me!
 
 ## Hyp-0 boot
 
@@ -71,7 +71,7 @@ The boot sequence is :
 - CPU general setup
 - Check and load the partitions to their expected memories locations
 - Setup the scheduler
-- Run the scheduler !
+- Run the scheduler!
 
 ## Parts
 

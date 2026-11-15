@@ -121,7 +121,7 @@ __attribute__ ((target("general-regs-only"), interrupt("SWI")))
 int handle_syscall(int SYSCALL_ID, void *p1, void *p2){
     int is_defined;
     
-    is_defined = (SYSCALL_ID < __syscall_callbacks_count) && (__syscall_callbacks[SYSCALL_ID] != 0);
+    is_defined = (SYSCALL_ID < __syscall_callbacks_count) && (__syscall_callbacks[SYSCALL_ID]!= 0);
 
     if(is_defined){
         _kprintf("SYSCALL_ID:%d\n\r", SYSCALL_ID);
@@ -134,7 +134,7 @@ int handle_syscall(int SYSCALL_ID, void *p1, void *p2){
 };
 ```
 
-And how do you call the handler you may ask ? Well, simply (depending on your callback count of parameters) :
+And how do you call the handler you may ask? Well, simply (depending on your callback count of parameters) :
 ```c
 int __syscall0(int SYSCALL_ID);
 int __syscall1(int SYSCALL_ID, void *p1);
@@ -151,9 +151,9 @@ So, from this `__syscall2` call, we climb up to the handler calling `__syscall_c
 ```c
 int uart_send(char *text, unsigned int n_char);
 ```
-Bim, profit !
+Bim, profit!
 
-Some makefiles still misbehave a bit and don't take into account some recently compiled artifacts... make clean and make again does the trick !
+Some makefiles still misbehave a bit and don't take into account some recently compiled artifacts... make clean and make again does the trick!
 
 ## Yes but
 

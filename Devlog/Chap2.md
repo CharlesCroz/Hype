@@ -4,7 +4,7 @@ Time too look more into MMU, especially permission bits and how to maintain a ke
 
 ## APX, AP1 and AP0
 
-Table entries have these bits, they are about read/write permission (how about execute ?).
+Table entries have these bits, they are about read/write permission (how about execute?).
 
 | APX   |	AP[1]	| AP[0]   |	Privileged	|   Unprivileged	| Description   |
 | - | - | - | - | - | - |
@@ -33,13 +33,13 @@ MMU Entry 0xfe000000 mask 0x00000000
 MMU Entry 0xfff04c0e mask 0x00000c00
 ```
 
-So basically, entries 0x0 to 0xC00 (excluded) have APX=0, AP1=AP0=1 (full access), then entries 0xC00 to 0xE00 (excluded) APX=AP1=AP0=0 (reserved), etc. How about table entries bits [1:0] ? 0b10 for full access entries, 0b00 for reserved.
+So basically, entries 0x0 to 0xC00 (excluded) have APX=0, AP1=AP0=1 (full access), then entries 0xC00 to 0xE00 (excluded) APX=AP1=AP0=0 (reserved), etc. How about table entries bits [1:0]? 0b10 for full access entries, 0b00 for reserved.
 
-How to mess with it (and enjoy it) ? I could make sure I have a DataAbortHandler that does something, modify a section to be readonly, reload the table, try to write a forbiden section, and be happy.  
+How to mess with it (and enjoy it)? I could make sure I have a DataAbortHandler that does something, modify a section to be readonly, reload the table, try to write a forbiden section, and be happy.  
 
 ## Make it crash
 
-It's not that easy to have this fault... Because you need to make it readonly in the MMU. Ok, it's doable. Then you have to unmask async exception, by clearing bit A in CPSR. Oh, but when you try to write CPSR, the compiler sneakingly replaces `msr cpsr, r0` (move to special register CPSR from genneral register r0) by.... `msr cpsr_fc, r0`, updating only bits [31:24] and [7:0] ! So yeah, `msr cpsr_x, r0` to write bits [15:8]...
+It's not that easy to have this fault... Because you need to make it readonly in the MMU. Ok, it's doable. Then you have to unmask async exception, by clearing bit A in CPSR. Oh, but when you try to write CPSR, the compiler sneakingly replaces `msr cpsr, r0` (move to special register CPSR from genneral register r0) by.... `msr cpsr_fc, r0`, updating only bits [31:24] and [7:0]! So yeah, `msr cpsr_x, r0` to write bits [15:8]...
 
 But. The MMU table configuration tags the sections with a 4 bits Domain ID (0:15), and the register DACR (Domain Access Control Register) marks each domains: 
 - 0b00:"no access" (Fault)
@@ -53,11 +53,11 @@ So, I made Key 1 callback function try to write data to 0x100000, and Key 0 chan
 
 ![BOOM](./images/DataAbortHandler.gif)
 
-Yeah.... Many things to do to make it fail graciously !
+Yeah.... Many things to do to make it fail graciously!
 
 Personnal reminder : Domains, CPSR_[suffix:fsxc], TLB (cached table) ivalidation.
 
 ## Now what
 
-I guess I'll have to... start thinking about making an actual hypervisor with actual processes doing actual things ? It terrifies me !
+I guess I'll have to... start thinking about making an actual hypervisor with actual processes doing actual things? It terrifies me!
 

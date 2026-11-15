@@ -1,6 +1,6 @@
 # Chapitre 3 - Hyp-0, Part 0
 
-So, time to have usable configuration files and the first autogen Python scripts !
+So, time to have usable configuration files and the first autogen Python scripts!
 
 ## The details of the configuration files
 
@@ -118,7 +118,7 @@ Also, the smaller table have a smaller memory alignment requirement. So if N=3, 
 
 ## Let's put this together
 
-I've put up a Python script, `process_config.py`, to process config files and template files into... actual code ! That compiles ! And runs !
+I've put up a Python script, `process_config.py`, to process config files and template files into... actual code! That compiles! And runs!
 
 First step makes .S files for the tables. From the following template :
 
@@ -237,7 +237,7 @@ Oh, and the MMU Tables are in boot.elf, but....
 
 The alignment is wrong (but the addresses are funny, B2C, C2C, Bac...)
 
-So... some generated linker script for data alignment ? Here we go... 
+So... some generated linker script for data alignment? Here we go... 
 
 ```
 .MMU_section : {
@@ -258,11 +258,11 @@ That includes the generated aligned sections :
    *(.MMU_TTBL_pushy_section)
 ```
 
-And... it works ! Look at this beautiful 128/0x80-byte alignment ! Oh, the feeling of accomplishment!
+And... it works! Look at this beautiful 128/0x80-byte alignment! Oh, the feeling of accomplishment!
 
 
 ![MMU Tables](./images/Chap_3_0_Partition_Align_good.png)
 
 ## Next
 
-Well, I don't know yet, see for yourself ! [Chapter 3, part 1](./Chap3-1.md)
+Well, I don't know yet, see for yourself! [Chapter 3, part 1](./Chap3-1.md)
