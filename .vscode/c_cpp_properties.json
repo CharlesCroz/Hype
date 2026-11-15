@@ -3,7 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Hype/kernel/boot/include",
+                "${workspaceFolder}/Hype/kernel/autogen/include"
             ],
             "defines": [],
             "compilerPath": "arm-none-eabi-gcc",

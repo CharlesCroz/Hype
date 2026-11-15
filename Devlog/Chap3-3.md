@@ -48,3 +48,21 @@ So, let's check program and sections headers, and voila !
 
 ![ELF Program and Section Headers](./images/Chap_3_3_ELF1.png)
 
+## Recipe vs result
+
+Before I try to load a partition elf, I want to compare what I understand from the ELF format with what xsdb does when it runs the command to download the elf file to the card.
+
+Wikipedia entry describes the program header section as follows : _The program header table tells the operating system how to create a process image._ Let's start there. A program section can be of various types, but we just have 0x70000001 and 0x00000001, which are respectively an ARM specific program related to exception handling and a loadable segment. Let's treat them both as Loadable for now.
+
+Program entry 0 tells us that starting offset 0x00009180 in the elf file should be loaded at virtual/physical address 0x00008180, 8 bytes into 8 bytes of memory (no zero-padding).
+
+Program entry 1 tells us that starting offset 0x00001000 in the elf file should be loaded at virtual/physical address 0x00000000, 0x00008190 bytes into 0x000e5d0 bytes of memory (zero-padded).
+
+So, we'll ignore the first entry, and compare the content of program entry 1 to what is present in the ram.
+
+![ELF RAM compare](./images/Chap_3_3_ELF_Compare.png)
+
+So, looks bright! The loaded section is the same as what's in the RAM! I thought they would be some difference, but nope! Good! The rest... I don't know if xsdb zeroed it and it got modified during the execution, or if it comes from startup ram noise. Meh, the first part is actually already a victory! 
+
+
+

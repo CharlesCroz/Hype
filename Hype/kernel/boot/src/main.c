@@ -67,8 +67,53 @@ void print_elf_header(const struct elf_header *header){
         _kprintf("\tsh_type 0x%x, sh_size 0x%x, sh_offset 0x%x\n\r", 
             sheaders[i].sh_type, sheaders[i].sh_size, sheaders[i].sh_offset);
     }
+}
 
+void compare_elf(struct elf_header *header, const uint8_t *ref){
+    const struct elf_pheader *pheaders = (const struct elf_pheader *)((unsigned int)header + (unsigned int)header->e_phoff);
 
+    const struct elf_pheader *prog = &pheaders[1];
+    
+    int was_same = 1;
+    int diff_count = 0;
+    int first_diff = 0;
+    const char *segment = (const char *)((uint32_t)header + prog->p_offset);
+    _kprintf("Comparing 0x%x bytes at 0x%p\r\n", prog->p_filesz, ref);
+    for(int i = 0; i < prog->p_filesz; i++){
+        if(segment[i] != ref[i]){
+            diff_count++;
+        }
+        if(segment[i] != ref[i] && was_same){
+            was_same = 0;
+            first_diff = i;
+        }else if(segment[i] == ref[i] && !was_same){
+            _kprintf("At 0x%p, diff of %d bytes\r\n", first_diff, diff_count);
+            was_same = 1;
+            diff_count = 0;
+        }
+    }
+    if(!was_same){
+        _kprintf("At 0x%p, diff of %d bytes\r\n", first_diff, diff_count);
+    }
+
+    _kprintf("Checking 0x%x zero bytes at 0x%p\r\n", (prog->p_memsz-prog->p_filesz), (void *)prog->p_filesz);
+    for(int i = prog->p_filesz; i < prog->p_memsz; i++){
+        if(0 != ref[i]){
+            diff_count++;
+        }
+        if(0 != ref[i] && was_same){
+            was_same = 0;
+            first_diff = i;
+        }else if(0 == ref[i] && !was_same){
+            _kprintf("At 0x%p, %d non-zero bytes\r\n", first_diff, diff_count);
+            was_same = 1;
+            diff_count = 0;
+        }
+    }
+    if(!was_same){
+        _kprintf("At 0x%p, %d non-zero bytes\r\n", first_diff, diff_count);
+    }
+    
 }
 
 int main()
@@ -114,6 +159,9 @@ int main()
 
     struct elf_header *header = (struct elf_header *) 0x100000;
     print_elf_header(header);
+    
+
+    compare_elf(header, (const uint8_t *)0);
 
     return 0;
 }
