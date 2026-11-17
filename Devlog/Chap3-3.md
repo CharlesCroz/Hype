@@ -182,3 +182,9 @@ For safety reason I've heard, but I'm a dangerous person! So, instead of C inlin
 ![ELF Load and Run](./images/Chap_3_3_ELF_Load_and_Run.png)
 
 It grnblnbml worked! 
+
+## Next
+
+Before we move forward, let me repeat myself. IT. WORKED. I've developped code for a while, but for the first time in my life, I've made a program that configures some hardware, then loads and runs another program, independantly compiled. AND. IT. WORKED.
+
+Next is going to be about configuring the MMU for a specific process, and then a better packaging of partitions. And then, Hyp-0 is done? 
