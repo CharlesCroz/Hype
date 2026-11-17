@@ -25,7 +25,7 @@ targets -set -nocase -filter {name =~ "*A9*#0"}
 dow ./kernel/boot/obj/boot.elf
 configparams force-mem-access 0
 
-dow -data {./kernel/boot/obj/boot.elf} 0x100000
+dow -data {./partitions/term/prog.elf} 0x100000
 
 # Starts CPU0
 con

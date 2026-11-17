@@ -3,15 +3,15 @@
 TARGET = uart
 
 # Export
-EXPORT_DIR ?= ../export/
+EXPORT_DIR ?= ../export/kernel/
 EXPORT_LIB = $(EXPORT_DIR)/lib/
 EXPORT_INC = $(EXPORT_DIR)/include/
 
 
 ###########################
 ## Kernel objects
-KERNEL_INC = ../../boot/include
-AUTOGEN_INC = ../../autogen/include
+KERNEL_INC = ../../kernel/boot/include
+AUTOGEN_INC = ../../autogen/kernel/include
 
 ###########################
 ## Local objects

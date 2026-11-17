@@ -83,3 +83,102 @@ int buffer_init(struct rolling_buffer *buffer, char *data, unsigned len);
 R0 (decimal 35232) maps to the struct rolling_buffer pointer, and r1 (decimal 35232 + 20 0x89b4!) to the data. I could read the trash that is there and get the last 1024 printed bytes. But well deal with hacking the kernel later, prehaps? 
 
 But it does confirm the "memory used to store variables" theory. I like that. What remains to be done? Unfortunately, everything!
+
+## Elves
+
+So, let's cook our own ELF and take look at it? 
+
+Yes, but for that, I've had to once again rework my folder... 
+```bash
+$ tree -d
+.
+├── autogen
+│   ├── kernel
+│   │   ├── include
+│   │   └── src
+│   └── partitions
+│       ├── include
+│       └── src
+├── conftool
+│   ├── configs
+│   └── templates
+├── drivers
+│   ├── call
+│   │   ├── include
+│   │   └── src
+│   ├── gpio
+│   ├── time
+│   └── uart
+│       ├── include
+│       └── src
+├── kernel
+│   ├── arm
+│   │   ├── hw
+│   │   ├── include
+│   │   └── lib
+│   └── boot
+│       ├── include
+│       ├── obj
+│       └── src
+└── partitions
+    ├── blinky
+    ├── pushy
+    └── term
+```
+
+Using tools in conftoofs populates autogen folder sources and headers. Then drivers compilation compiles and export to drivers/exports. Then autogen and kernel are compiled. Then you can compile partitions.
+
+But like this, I can compile `term` partition with system calls properly defined. For now, its code is very simple:
+```c
+#include "drivers.h"
+
+int strlen(const char *str){
+    int res = 0;
+    while (*(str++))
+    {
+        res++;
+    }
+    return res;
+}
+
+void print(const char *str){
+    uart_send(str, strlen(str));
+}
+
+int main(){
+    print("Hello from term partition!\n\r");
+    return 42;
+}
+```
+How to test it? I'll try to load the elf at 0x100000, then... then I don't want to set MMU for now so I've made a linker script to generate code that should load at 0x200000 RAM address.
+
+```
+MEMORY
+{
+   RAM_allocated : ORIGIN = 0x200000, LENGTH = 0x100000
+}
+
+ENTRY(main)
+
+SECTIONS
+{
+    .text : {
+        *(.text)
+    } > RAM_allocated
+}
+```
+
+Then, I just (right?) have to load the code according to the ELF information, push link return register, and jump to entrypoint!
+
+It almost worked first time (hahaha, help me), for the following ([sourced](https://support.arm.com/documentation/dui0472/m/Using-the-Inline-and-Embedded-Assemblers-of-the-ARM-Compiler/Inline-assembler-instruction-restrictions-in-C-and-C---code?lang=en)) reason:
+> There are a number of instructions that the inline assembler does not support.
+>
+> Specifically, the following instructions are not supported:
+>
+> BKPT, BX, BXJ, and BLX instructions.
+
+For safety reason I've heard, but I'm a dangerous person! So, instead of C inline assembly, I made a function in a .S (called `hackjump`).
+
+![ELF Load and Run](./images/Chap_3_3_ELF_Load_and_Run.png)
+
+It grnblnbml worked! 

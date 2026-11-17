@@ -1,8 +1,8 @@
 ###########################
 
 ### Kernel includes
-K_INC := ../boot/include
-D_INC := ../drivers/export/include
+K_INC := ../../kernel/boot/include
+D_INC := ../../drivers/export/kernel/include
 
 ### OBJS
 SRC := ./src
@@ -34,7 +34,7 @@ $(OBJ)/%.o:$(SRC)/%.S
 	arm-none-eabi-gcc -c $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f **/*.o *~
+	rm -rf **/*.o *~ $(OBJ)
 
 veryclean: clean
 	rm -rf $(SRC)/*.c $(SRC)/*.S $(INC)/*.h $(INC)/*.ld $(OBJ)

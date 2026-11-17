@@ -5,7 +5,7 @@ TARGET = boot
 
 ###########################
 ## Drivers
-EXPORT_DIR ?= ../drivers/export/
+EXPORT_DIR ?= ../../drivers/export/kernel/
 EXPORT_LIB := $(EXPORT_DIR)/lib/
 EXPORT_INC := $(EXPORT_DIR)/include/
 EXPORT_OBJ := $(wildcard $(EXPORT_LIB)/*.a)
@@ -15,7 +15,7 @@ EXPORT_OBJ := $(wildcard $(EXPORT_LIB)/*.a)
 ## Autogen objects
 
 ### Folders 
-AUTOGEN_LOC ?= ../autogen
+AUTOGEN_LOC ?= ../../autogen/kernel
 AUTOGEN_INC := $(AUTOGEN_LOC)/include
 AUTOGEN_OBJ := $(AUTOGEN_LOC)/obj
 

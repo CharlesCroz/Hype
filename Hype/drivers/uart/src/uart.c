@@ -62,7 +62,7 @@ void __uart_hw_callback(void *param){
     }
 }
 
-int uart_send(char *text, unsigned int n_char){
+int __uart_send(const char *text, unsigned int n_char){
     int res = buffer_push(&uart_buffer, text, n_char);
     __uart_hw_callback((void *)0);
     return res;

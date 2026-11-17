@@ -1,1 +1,1 @@
-    (syscall_callback) /*%%FUNCTION%%*/,
+    (syscall_callback) __/*%%FUNCTION%%*/,

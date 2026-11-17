@@ -1,12 +1,15 @@
 all:
-	make -C kernel/drivers
-	make -C kernel/autogen
-	make -C kernel/boot
+	make -C drivers
+	make -C autogen
+	make -C kernel
 
-autogen:
-	python3 conftool/process_config.py conftool/configs/platform.yml conftool/configs/sample-conf.yml conftool/templates/ kernel/autogen/
+autogen: FORCE
+	python3 conftool/process_config.py conftool/configs/platform.yml conftool/configs/sample-conf.yml conftool/templates/ ./autogen/
 
 clean:
-	make -C kernel/autogen clean
-	make -C kernel/drivers clean
-	make -C kernel/boot clean
+	make -C autogen clean
+	make -C drivers clean
+	make -C kernel clean
+
+FORCE:
+

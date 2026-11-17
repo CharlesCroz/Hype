@@ -92,9 +92,14 @@ drivers:
     - uart.h
     # - time.h
     # - gpio.h
-  callbacks:
+  functions:
     - name: uart_send
       id: 0
+      params:
+        - type: "const char *"
+          name: text
+        - type: "unsigned int"
+          name: len
     # - name : uart_receive
     #   id: 1 
     # - name : get_time

@@ -159,7 +159,7 @@ void _kprintf(const char *pattern, ...){
     }
     va_end(args);
 
-    uart_send(built_string, at);
+    __uart_send(built_string, at);
 }
 
 

@@ -38,6 +38,7 @@ void print_elf_header(const struct elf_header *header){
     _kprintf("e_ident[4] class   0x%x (1:32bits, 2:64bits)\n\r", (int)header->e_ident[4]);
     _kprintf("e_type             0x%x\n\r", (int)header->e_type);
     _kprintf("e_machine          0x%x\n\r", (int)header->e_machine);
+    _kprintf("e_entry            0x%p\n\r", (int)header->e_entry);
     _kprintf("Program e_phoff    0x%p\n\r", (int)header->e_phoff);
     _kprintf("Section e_shoff    0x%p\n\r", (int)header->e_shoff);
     _kprintf("e_shstrndx         0x%p\n\r", (int)header->e_shstrndx);
@@ -113,8 +114,29 @@ void compare_elf(struct elf_header *header, const uint8_t *ref){
     if(!was_same){
         _kprintf("At 0x%p, %d non-zero bytes\r\n", first_diff, diff_count);
     }
-    
 }
+
+void *load_elf(struct elf_header *elf){
+    const struct elf_pheader *pheaders = (const struct elf_pheader *)((unsigned int)elf + (unsigned int)elf->e_phoff);
+
+    for(int i = 0; i < elf->e_phnum; i++){
+        if(pheaders[i].p_type == PT_LOAD){
+            const uint8_t *code_src = (const uint8_t *)((unsigned int)elf + pheaders[i].p_offset);
+            uint8_t *code_dst = (uint8_t *)(pheaders[i].p_paddr);
+
+            _kprintf("Loading prog[%d] %d bytes at %p\n\r", i, pheaders[i].p_filesz, code_dst);
+
+            for(int byte = 0; byte < pheaders[i].p_filesz; byte++){
+                code_dst[byte] = code_src[byte];
+            }
+        }
+    }
+
+    return (void *)elf->e_entry;
+
+}
+
+int hackjump(void *addr);
 
 int main()
 {
@@ -161,7 +183,20 @@ int main()
     print_elf_header(header);
     
 
-    compare_elf(header, (const uint8_t *)0);
+    // compare_elf(header, (const uint8_t *)0);
+
+    /* Load and jump */
+    void *entrypoint;
+    volatile int retval;
+    
+    entrypoint = load_elf(header);
+    _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
+
+    hackjump(entrypoint);
+    __asm("mov %[result], r0" : [result] "=r" (retval));
+
+    _kprintf("Done, execution return value is %d\n\r", retval);
+
 
     return 0;
 }
