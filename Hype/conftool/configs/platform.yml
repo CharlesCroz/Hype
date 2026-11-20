@@ -91,8 +91,7 @@ drivers:
   headers:
     - uart.h
     - led.h
-    # - time.h
-    # - gpio.h
+    - time.h
   functions:
     - name: uart_send
       id: 0
@@ -122,12 +121,13 @@ drivers:
           name: value
         - type: "int"
           name: mask
-    # - name : uart_receive
-    #   id: 1 
-    # - name : get_time
-    #   id: 2 
-    # - name : btn_read
-    #   id: 3 
+    - name: time_get
+      id: 4
+      params:
+        - type: "int *"
+          name: seconds
+        - type: "int *"
+          name: microseconds
 
 
 

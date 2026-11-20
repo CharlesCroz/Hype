@@ -40,5 +40,15 @@ int main(){
 
     print("\r\n");
 
+    int seconds, microseconds;
+    int target = 1;
+    while(target < 10){
+        time_get(&seconds, (void *)0);
+        if(seconds > target){
+            led_write(target, 0xF);
+            target++;
+        }
+    }
+
     return 42;
 }

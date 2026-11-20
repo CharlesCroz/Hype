@@ -9,7 +9,7 @@ partitions:
     permissions:
       - uart_receive
       - uart_send
-      - get_time
+      - time_get
 
   - name: blinky
     id: 1
@@ -18,7 +18,7 @@ partitions:
       len:      0x100000
       pa_start: 0x1000000
     permissions:
-      - get_time
+      - time_get
 
   - name: pushy
     id: 2

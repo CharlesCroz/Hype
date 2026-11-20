@@ -3,7 +3,7 @@
 In the previous chapter, I talkedended on a note stating I'll be taking two steps to get Hyp-0 ready: understanding better the MMU, and a better partition packaging. I've kind of changed my mind, and I'll try to do things a bit differently. And first, I want to enrich my drivers a little, with:
 - led_read
 - led_write
-- get_time
+- time_get
 - uart_read
 
 ## More drivers
@@ -42,6 +42,15 @@ Let's... do this?
 After a while, I can read inputs:
 
 ![UART Recv](./images/Chap_3_4_UartRecv.png)
+
+### Time
+
+Ok, last piece of driver. I'll have to get another HW timer to increment an uptime counter (microseconds and seconds). Here we here we go.
+
+Version 0 of this is actually a couple of counter that increments when I call `time_get`. So the first call will return (0, 0), then (0, 1) etc.
+
+It worked from the partition point of view, but it's obiously wrong. And since the "proof of success" involved me looking at blinking LED... Anyways, back to timer setup!
+
 
 ## ARMv7 context elements
 
