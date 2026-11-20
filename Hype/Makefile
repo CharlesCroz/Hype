@@ -4,7 +4,7 @@ all:
 	make -C kernel
 
 autogen: FORCE
-	python3 conftool/process_config.py conftool/configs/platform.yml conftool/configs/sample-conf.yml conftool/templates/ ./autogen/
+	python3 conftool/process_config.py ./conftool/configs/platform.yml conftool/configs/sample-conf.yml ./conftool/templates ./autogen/ ./partitions
 
 clean:
 	make -C autogen clean
