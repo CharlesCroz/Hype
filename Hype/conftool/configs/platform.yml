@@ -90,6 +90,7 @@ memory:
 drivers:
   headers:
     - uart.h
+    - led.h
     # - time.h
     # - gpio.h
   functions:
@@ -100,6 +101,27 @@ drivers:
           name: text
         - type: "unsigned int"
           name: len
+    - name: uart_recv
+      id: 1
+      params:
+        - type: "char *"
+          name: text
+        - type: "unsigned int"
+          name: len
+    - name: led_read
+      id: 2
+      params:
+        - type: "int *"
+          name: value
+        - type: "int *"
+          name: mask
+    - name: led_write
+      id: 3
+      params:
+        - type: "int"
+          name: value
+        - type: "int"
+          name: mask
     # - name : uart_receive
     #   id: 1 
     # - name : get_time

@@ -230,7 +230,7 @@ def make_driver_c(driver_fct, template_dir, autogen_dir):
                 call = f"__syscall2({e["id"]}, (void *){e["params"][0]["name"]}, (void *){e["params"][1]["name"]})"
             fct_defs.append(f"int {e["name"]}({params}){{\n\treturn {call};\n}}")
 
-        dest_file.write(template.replace("/*%%DRIVERS%%*/", "\n".join(fct_defs)))
+        dest_file.write(template.replace("/*%%DRIVERS%%*/", "\n\n".join(fct_defs)))
 
 
 def make_partitions_lscripts(partitions, template_dir, partitions_dir):

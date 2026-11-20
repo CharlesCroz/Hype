@@ -152,9 +152,7 @@ int main()
         _kprintf(" - %s\n\r", hype_partitions[i].name);
     }
     
-    _kprintf("\n\n\rSyscall tests\r\n");
-
-    *((volatile int *)0x40000000) = 15;
+    _kprintf("\n\n\r");
 
     gic_activate_irq(61, 3, key, (void *)0);
     gic_activate_irq(62, 3, key, (void *)1);
@@ -175,16 +173,9 @@ int main()
         /* nop */
     }
 
-    const char hello[] = "Hello\n\r";
-    __syscall2(SYSCALL_UART_SEND, (void *)hello, (void *)sizeof(hello));
-    __syscall0(1);
-
     struct elf_header *header = (struct elf_header *) 0x100000;
     print_elf_header(header);
     
-
-    // compare_elf(header, (const uint8_t *)0);
-
     /* Load and jump */
     void *entrypoint;
     volatile int retval;

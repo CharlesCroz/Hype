@@ -42,8 +42,6 @@ C_OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(C_SRCS))
 S_SRCS := $(wildcard $(SRC)/*.S)
 S_OBJS := $(patsubst $(SRC)/%.S, $(OBJ)/%.o, $(S_SRCS))
 
-LIBS  := $(wildcard $(OBJ)/*.a)
-
 TARGET := $(OBJ)/$(TARGET)
 
 ## compiler and linker flags
@@ -62,7 +60,7 @@ $(OBJ)/%.o:$(SRC)/%.c
 $(OBJ)/%.o:$(SRC)/%.S
 	arm-none-eabi-gcc -c $(CFLAGS) -o $@ $<
 
-$(TARGET).elf: $(C_OBJS) $(S_OBJS)
+$(TARGET).elf: $(C_OBJS) $(S_OBJS) $(EXPORT_OBJ)
 	arm-none-eabi-gcc $(LDFLAGS) -o $@ $(C_OBJS) $(S_OBJS) $(AUTOGEN_OBJS) $(EXPORT_OBJ) $(LIBS) -Wl,--start-group,-lgcc,-lc,--end-group
 
 clean:

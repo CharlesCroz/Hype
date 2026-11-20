@@ -26,7 +26,7 @@ TARGET := $(OBJ)/$(TARGET)
 ## compiler and linker flags
 COMMON_FLAGS := -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -nostdlib
 export CFLAGS  = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC) -I$(AUTOGEN_INC) -I$(EXPORT_INC)
-export LDFLAGS = $(COMMON_FLAGS) -Wl,-T -Wl,lscript.ld -Lobj -L$(AUTOGEN_INC) -L$(EXPORT_INC)
+export LDFLAGS = $(COMMON_FLAGS) -Wl,-T -Wl,_lscript.ld -Lobj -L$(AUTOGEN_INC) -L$(EXPORT_INC)
 
 ###########################
 ## Hype objects and headers

@@ -14,14 +14,14 @@ int handle_syscall(int SYSCALL_ID, void *p1, void *p2){
     is_defined = (SYSCALL_ID < __syscall_callbacks_count) && (__syscall_callbacks[SYSCALL_ID] != 0);
 
     if(is_defined){
-        _kprintf("SYSCALL_ID:%d\n\r", SYSCALL_ID);
+        // _kprintf("SYSCALL_ID:%d\n\r", SYSCALL_ID);
         return __syscall_callbacks[SYSCALL_ID](p1, p2);
     }else{
         _kprintf("SYSCALL_ID:%d-undef\n\r", SYSCALL_ID);
     }
     
     return -1;
-};
+}
 
 int __syscall0(int SYSCALL_ID){
     return __syscall2(SYSCALL_ID, 0, 0);

@@ -4,6 +4,8 @@
 /* Private Hype functions, should be hidden from partitions */
 int __uart_init();
 void __uart_hw_callback(void *param);
+
 int __uart_send(const char *text, unsigned int len);
+int __uart_recv(char *text, unsigned int len);
 
 #endif
