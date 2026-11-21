@@ -3,6 +3,6 @@
 
 /* Private Hype functions, should be hidden from partitions */
 void __time_init();
-int __time_get(unsigned int * seconds, unsigned int * microseconds);
+int __time_get(unsigned int *seconds, unsigned int *microseconds);
 
 #endif

@@ -4,18 +4,19 @@
 #include <stdarg.h>
 
 
-#define XUARTPS_SR_OFFSET       0x2c
-#define XUARTPS_FIFO_OFFSET     0x30
-#define XUARTPS_SR_TX_FULL_BIT  0b10000
+#define XUARTPS_SR_OFFSET      0x2c
+#define XUARTPS_FIFO_OFFSET    0x30
+#define XUARTPS_SR_TX_FULL_BIT 0b10000
 
 static void _kprint_putchar(char c){
-    volatile unsigned int *reg_uart_fifo_status = (void *)(XPAR_PS7_UART_1_BASEADDR + XUARTPS_SR_OFFSET);
-    volatile unsigned int *reg_uart_fifo =        (void *)(XPAR_PS7_UART_1_BASEADDR + XUARTPS_FIFO_OFFSET);
+    volatile unsigned int *reg_uart_fifo_status = (void *) (XPAR_PS7_UART_1_BASEADDR + XUARTPS_SR_OFFSET);
+    volatile unsigned int *reg_uart_fifo        = (void *) (XPAR_PS7_UART_1_BASEADDR + XUARTPS_FIFO_OFFSET);
 
     while(*reg_uart_fifo_status & XUARTPS_SR_TX_FULL_BIT)
-        ; /* Wait for UART TX FIFO to be "not full" */
+        ;               /* Wait for UART TX FIFO to be "not full" */
     *reg_uart_fifo = c; /* put char in UART TX FIFO*/
 }
+
 
 void _kprint(const char *string){
     while(*string){
@@ -23,6 +24,8 @@ void _kprint(const char *string){
         string++;
     }
 }
+
+
 void _sprint_u32dec(char *buff, unsigned int val){
     int digit_count = 0;
     char digits[10];
@@ -35,7 +38,7 @@ void _sprint_u32dec(char *buff, unsigned int val){
 
     if(digit_count == 0){
         *(buff++) = '0';
-    }else{
+    } else {
         while(digit_count){
             digit_count--;
             *(buff++) = ('0' + digits[digit_count]);
@@ -43,25 +46,27 @@ void _sprint_u32dec(char *buff, unsigned int val){
     }
 
     *buff = '\0';
-}
+} /* _sprint_u32dec */
+
 
 void _sprint_i32dec(char *buff, int val){
     int isneg = (val < 0);
 
     if(isneg){
-        val = -val;
+        val       = -val;
         *(buff++) = '-';
     }
     _sprint_u32dec(buff, val);
 }
 
+
 void _sprint_p(char *buff, unsigned int val){
-    static const char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    static const char hex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
     int shift;
 
     shift = sizeof(val) * 8;
     while(shift){
-        shift = shift - 4;
+        shift     = shift - 4;
         *(buff++) = hex[(val >> shift) & 0xF];
     }
     *buff = '\0';
@@ -69,9 +74,10 @@ void _sprint_p(char *buff, unsigned int val){
     return;
 }
 
+
 void _sprint_u32hex(char *buff, unsigned int val){
-    static const char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    int digit_count = 0;
+    static const char hex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    int digit_count         = 0;
     unsigned char digits[10];
 
     while(val){
@@ -82,7 +88,7 @@ void _sprint_u32hex(char *buff, unsigned int val){
 
     if(digit_count == 0){
         *(buff++) = '0';
-    }else{
+    } else {
         while(digit_count){
             digit_count--;
             *(buff++) = hex[digits[digit_count]];
@@ -92,7 +98,8 @@ void _sprint_u32hex(char *buff, unsigned int val){
     *buff = '\0';
 
     return;
-}
+} /* _sprint_u32hex */
+
 
 void _kprintf(const char *pattern, ...){
     va_list args;
@@ -100,15 +107,15 @@ void _kprintf(const char *pattern, ...){
     char number_buffer[16];
     int at = 0;
     const char *at_n = number_buffer;
-    
+
     va_start(args, pattern);
-    
+
     while(*pattern){
         if(*pattern == '%'){
             pattern++;
 
             /* Process thing */
-            switch (*pattern){
+            switch(*pattern){
                 case 'x':
                     _sprint_u32hex(number_buffer, va_arg(args, unsigned int));
                     at_n = number_buffer;
@@ -130,7 +137,7 @@ void _kprintf(const char *pattern, ...){
                     at_n = va_arg(args, const char *);
                     break;
                 case 'c':
-                    number_buffer[0] = (char)(va_arg(args, int));
+                    number_buffer[0] = (char) (va_arg(args, int));
                     number_buffer[1] = '\0';
                     at_n = number_buffer;
                     break;
@@ -139,7 +146,7 @@ void _kprintf(const char *pattern, ...){
                     number_buffer[1] = '\0';
                     at_n = number_buffer;
                     break;
-                
+
                 default:
                     break;
             }
@@ -147,7 +154,7 @@ void _kprintf(const char *pattern, ...){
                 built_string[at] = *(at_n++);
                 at++;
             }
-        }else{
+        } else {
             built_string[at] = *pattern;
             at++;
         }
@@ -160,24 +167,28 @@ void _kprintf(const char *pattern, ...){
     va_end(args);
 
     __uart_send(built_string, at);
-}
+} /* _kprintf */
 
 
 void _kprint_i32dec(int val){
     char buff[16];
+
     _sprint_i32dec(buff, val);
     _kprint(buff);
 }
 
+
 void _kprint_u32dec(unsigned int val){
     char buff[16];
+
     _sprint_u32dec(buff, val);
     _kprint(buff);
 }
 
+
 void _kprint_u32hex(unsigned int val){
     char buff[16];
+
     _sprint_u32hex(buff, val);
     _kprint(buff);
 }
-

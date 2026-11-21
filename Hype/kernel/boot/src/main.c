@@ -7,12 +7,13 @@
 #include "partitions_configuration.h"
 #include "elf.h"
 
-#define REG_LED *((volatile int *)0x40000000)
+#define REG_LED *((volatile int *) 0x40000000)
 
 void key(void *arg){
     _kprintf("Key %d pressed\n\r", (int) arg);
     REG_LED = REG_LED ^ (1 << (int) arg);
 }
+
 
 struct scheduler_status {
     unsigned int current_ms;
@@ -27,70 +28,77 @@ void scheduler(void *param){
         sched_status->current_slot++;
         if(sched_status->current_slot == hype_scheduling_count){
             sched_status->current_slot = 0;
-            sched_status->current_ms = 0;
+            sched_status->current_ms   = 0;
         }
         // _kprintf("\033[13;25H%s   ", hype_partitions[hype_scheduling[sched_status->current_slot].partition_id].name);
     }
 }
 
-void print_elf_header(const struct elf_header *header){
-    _kprintf("ELF file located at 0x%p\n\r", (unsigned int)header);
-    _kprintf("e_ident[0:3] magic [0x%x]%c%c%c\n\r", (int)header->e_ident[0], header->e_ident[1], header->e_ident[2], header->e_ident[3]);
-    _kprintf("e_ident[4] class   0x%x (1:32bits, 2:64bits)\n\r", (int)header->e_ident[4]);
-    _kprintf("e_type             0x%x\n\r", (int)header->e_type);
-    _kprintf("e_machine          0x%x\n\r", (int)header->e_machine);
-    _kprintf("e_entry            0x%p\n\r", (int)header->e_entry);
-    _kprintf("Program e_phoff    0x%p\n\r", (int)header->e_phoff);
-    _kprintf("Section e_shoff    0x%p\n\r", (int)header->e_shoff);
-    _kprintf("e_shstrndx         0x%p\n\r", (int)header->e_shstrndx);
-    
 
-    const struct elf_pheader *pheaders = (const struct elf_pheader *)((unsigned int)header + (unsigned int)header->e_phoff);
+void print_elf_header(const struct elf_header *header){
+    _kprintf("ELF file located at 0x%p\n\r",                     (unsigned int) header);
+    _kprintf("e_ident[0:3] magic [0x%x]%c%c%c\n\r",              (int) header->e_ident[0], header->e_ident[1],
+             header->e_ident[2], header->e_ident[3]);
+    _kprintf("e_ident[4] class   0x%x (1:32bits, 2:64bits)\n\r", (int) header->e_ident[4]);
+    _kprintf("e_type             0x%x\n\r",                      (int) header->e_type);
+    _kprintf("e_machine          0x%x\n\r",                      (int) header->e_machine);
+    _kprintf("e_entry            0x%p\n\r",                      (int) header->e_entry);
+    _kprintf("Program e_phoff    0x%p\n\r",                      (int) header->e_phoff);
+    _kprintf("Section e_shoff    0x%p\n\r",                      (int) header->e_shoff);
+    _kprintf("e_shstrndx         0x%p\n\r",                      (int) header->e_shstrndx);
+
+
+    const struct elf_pheader *pheaders = (const struct elf_pheader *) ((unsigned int) header
+                                                                       + (unsigned int) header->e_phoff);
 
     for(int i = 0 ; i < header->e_phnum; i++){
         _kprintf("Program header entry %i\n\r", i);
-        _kprintf("\tp_type   0x%p",     pheaders[i].p_type);
-        _kprintf("  p_offset 0x%p\n\r", pheaders[i].p_offset);
-        _kprintf("\tp_vaddr  0x%p",     pheaders[i].p_vaddr);
-        _kprintf("  p_paddr  0x%p\n\r", pheaders[i].p_paddr);
-        _kprintf("\tp_filesz 0x%p",     pheaders[i].p_filesz);
-        _kprintf("  p_memsz  0x%p\n\r", pheaders[i].p_memsz);
-        _kprintf("\tp_flags  0x%p",     pheaders[i].p_flags);
-        _kprintf("  p_align  0x%p\n\r", pheaders[i].p_align);
+        _kprintf("\tp_type   0x%p",             pheaders[i].p_type);
+        _kprintf("  p_offset 0x%p\n\r",         pheaders[i].p_offset);
+        _kprintf("\tp_vaddr  0x%p",             pheaders[i].p_vaddr);
+        _kprintf("  p_paddr  0x%p\n\r",         pheaders[i].p_paddr);
+        _kprintf("\tp_filesz 0x%p",             pheaders[i].p_filesz);
+        _kprintf("  p_memsz  0x%p\n\r",         pheaders[i].p_memsz);
+        _kprintf("\tp_flags  0x%p",             pheaders[i].p_flags);
+        _kprintf("  p_align  0x%p\n\r",         pheaders[i].p_align);
     }
 
-    const struct elf_sheader *sheaders = (const struct elf_sheader *)((unsigned int)header + (unsigned int)header->e_shoff);
-    const char *section_names = (char *)((uint32_t)header + (uint32_t)sheaders[header->e_shstrndx].sh_offset);
+    const struct elf_sheader *sheaders = (const struct elf_sheader *) ((unsigned int) header
+                                                                       + (unsigned int) header->e_shoff);
+    const char *section_names = (char *) ((uint32_t) header + (uint32_t) sheaders[header->e_shstrndx].sh_offset);
     _kprintf("Section names at 0x%p\r\n", sheaders[header->e_shstrndx].sh_offset);
 
     for(int i = 0 ; i < header->e_shnum; i++){
-        _kprintf("Section header %i : %s", 
-                i, &section_names[sheaders[i].sh_name]);
-        _kprintf("\tsh_type 0x%x, sh_size 0x%x, sh_offset 0x%x\n\r", 
-            sheaders[i].sh_type, sheaders[i].sh_size, sheaders[i].sh_offset);
+        _kprintf("Section header %i : %s",
+                 i, &section_names[sheaders[i].sh_name]);
+        _kprintf("\tsh_type 0x%x, sh_size 0x%x, sh_offset 0x%x\n\r",
+                 sheaders[i].sh_type, sheaders[i].sh_size, sheaders[i].sh_offset);
     }
-}
+} /* print_elf_header */
+
 
 void compare_elf(struct elf_header *header, const uint8_t *ref){
-    const struct elf_pheader *pheaders = (const struct elf_pheader *)((unsigned int)header + (unsigned int)header->e_phoff);
+    const struct elf_pheader *pheaders = (const struct elf_pheader *) ((unsigned int) header
+                                                                       + (unsigned int) header->e_phoff);
 
     const struct elf_pheader *prog = &pheaders[1];
-    
-    int was_same = 1;
-    int diff_count = 0;
-    int first_diff = 0;
-    const char *segment = (const char *)((uint32_t)header + prog->p_offset);
+
+    int was_same        = 1;
+    int diff_count      = 0;
+    int first_diff      = 0;
+    const char *segment = (const char *) ((uint32_t) header + prog->p_offset);
+
     _kprintf("Comparing 0x%x bytes at 0x%p\r\n", prog->p_filesz, ref);
     for(int i = 0; i < prog->p_filesz; i++){
         if(segment[i] != ref[i]){
             diff_count++;
         }
         if(segment[i] != ref[i] && was_same){
-            was_same = 0;
+            was_same   = 0;
             first_diff = i;
-        }else if(segment[i] == ref[i] && !was_same){
+        } else if(segment[i] == ref[i] && !was_same){
             _kprintf("At 0x%p, diff of %d bytes\r\n", first_diff, diff_count);
-            was_same = 1;
+            was_same   = 1;
             diff_count = 0;
         }
     }
@@ -98,32 +106,34 @@ void compare_elf(struct elf_header *header, const uint8_t *ref){
         _kprintf("At 0x%p, diff of %d bytes\r\n", first_diff, diff_count);
     }
 
-    _kprintf("Checking 0x%x zero bytes at 0x%p\r\n", (prog->p_memsz-prog->p_filesz), (void *)prog->p_filesz);
+    _kprintf("Checking 0x%x zero bytes at 0x%p\r\n", (prog->p_memsz - prog->p_filesz), (void *) prog->p_filesz);
     for(int i = prog->p_filesz; i < prog->p_memsz; i++){
         if(0 != ref[i]){
             diff_count++;
         }
         if(0 != ref[i] && was_same){
-            was_same = 0;
+            was_same   = 0;
             first_diff = i;
-        }else if(0 == ref[i] && !was_same){
+        } else if(0 == ref[i] && !was_same){
             _kprintf("At 0x%p, %d non-zero bytes\r\n", first_diff, diff_count);
-            was_same = 1;
+            was_same   = 1;
             diff_count = 0;
         }
     }
     if(!was_same){
         _kprintf("At 0x%p, %d non-zero bytes\r\n", first_diff, diff_count);
     }
-}
+} /* compare_elf */
 
-void *load_elf(struct elf_header *elf){
-    const struct elf_pheader *pheaders = (const struct elf_pheader *)((unsigned int)elf + (unsigned int)elf->e_phoff);
+
+void * load_elf(struct elf_header *elf){
+    const struct elf_pheader *pheaders = (const struct elf_pheader *) ((unsigned int) elf
+                                                                       + (unsigned int) elf->e_phoff);
 
     for(int i = 0; i < elf->e_phnum; i++){
         if(pheaders[i].p_type == PT_LOAD){
-            const uint8_t *code_src = (const uint8_t *)((unsigned int)elf + pheaders[i].p_offset);
-            uint8_t *code_dst = (uint8_t *)(pheaders[i].p_paddr);
+            const uint8_t *code_src = (const uint8_t *) ((unsigned int) elf + pheaders[i].p_offset);
+            uint8_t *code_dst       = (uint8_t *) (pheaders[i].p_paddr);
 
             _kprintf("Loading prog[%d] %d bytes at %p\n\r", i, pheaders[i].p_filesz, code_dst);
 
@@ -133,14 +143,13 @@ void *load_elf(struct elf_header *elf){
         }
     }
 
-    return (void *)elf->e_entry;
-
+    return (void *) elf->e_entry;
 }
+
 
 int hackjump(void *addr);
 
-int main()
-{
+int main(){
     __uart_init();
     __time_init();
 
@@ -153,17 +162,17 @@ int main()
     for(int i = 0; i < hype_partitions_count; i++){
         _kprintf(" - %s\n\r", hype_partitions[i].name);
     }
-    
+
     _kprintf("\n\n\r");
 
-    gic_activate_irq(61, 3, key, (void *)0);
-    gic_activate_irq(62, 3, key, (void *)1);
-    gic_activate_irq(63, 3, key, (void *)2);
-    gic_activate_irq(64, 3, key, (void *)3);
+    gic_activate_irq(61, 3, key, (void *) 0);
+    gic_activate_irq(62, 3, key, (void *) 1);
+    gic_activate_irq(63, 3, key, (void *) 2);
+    gic_activate_irq(64, 3, key, (void *) 3);
 
 
-    scheduler_status = (struct scheduler_status){
-        .current_ms = hype_scheduling[hype_scheduling_count].to_ms - 1,
+    scheduler_status = (struct scheduler_status) {
+        .current_ms   = hype_scheduling[hype_scheduling_count].to_ms - 1,
         .current_slot = hype_scheduling_count - 1
     };
     tic_setup(1, scheduler, &scheduler_status);
@@ -171,17 +180,17 @@ int main()
     gic_enable();
 
     /* Wait for UART TX to be empty before we start messing with things */
-    while(((*(volatile unsigned int *)0xE000102C) & (1<<3)) == 0){
+    while(((*(volatile unsigned int *) 0xE000102C) & (1 << 3)) == 0){
         /* nop */
     }
 
     struct elf_header *header = (struct elf_header *) 0x100000;
     print_elf_header(header);
-    
+
     /* Load and jump */
     void *entrypoint;
     volatile int retval;
-    
+
     entrypoint = load_elf(header);
     _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
 
@@ -195,4 +204,4 @@ int main()
     _kprintf("Entering loop after %d and %d us\n\r", sec, microsec);
 
     return 0;
-}
+} /* main */
