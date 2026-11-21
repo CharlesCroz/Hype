@@ -57,7 +57,7 @@ Then again, according to the blinking frequency of the LEDs that I can visually 
 
 ### We good?
 
-Yes, we are. The margin for improvement is immense, but it'll do for now. Back to hosting partitions!
+Yes, we are. The margin for improvement is immense, but it'll do for now. After a bit of uncrustifying ([uncrustify](https://github.com/uncrustify/uncrustify) is a linter/code beautifier), back to hosting partitions!
 
 ## ARMv7 context elements
 
