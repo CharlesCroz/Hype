@@ -3,6 +3,7 @@
 #include "tic.h"
 #include "syscall.h"
 #include "uart.h"
+#include "time.h"
 #include "partitions_configuration.h"
 #include "elf.h"
 
@@ -141,6 +142,7 @@ int hackjump(void *addr);
 int main()
 {
     __uart_init();
+    __time_init();
 
     _kprintf("\033[2J\033[0;0H"
              "===================================\n\r"

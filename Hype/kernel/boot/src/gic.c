@@ -31,7 +31,7 @@ void handle_irq() {
     irq_id = *(volatile int *)(XPAR_SCUGIC_0_CPU_BASEADDR + GIC_ICCIAR_OFFSET);
     
     /* irq_id is 3FF, there has been an error somewhere */
-    if(irq_id < IRQ_HANDLERS_COUNT){
+    if((irq_id < IRQ_HANDLERS_COUNT )&& (IRQ_HANDLERS_TABLE[irq_id].handler != (void *)0)){
         /* Call handler */
         IRQ_HANDLERS_TABLE[irq_id].handler(IRQ_HANDLERS_TABLE[irq_id].param);
     

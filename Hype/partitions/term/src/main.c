@@ -15,6 +15,10 @@ void print(const char *str){
 
 int main(){
     int mask, value;
+    char c;
+    int seconds;
+    int target = 1;
+
     print("Hello from term partition!\n\r");
     led_write(0x2, 0xF);
     led_read(&value, &mask);
@@ -25,7 +29,6 @@ int main(){
     }
     print("\r\nPress [q] to exit\r\n");
     
-    char c = 'x';
     do{
         c = '\0';
         uart_recv(&c, 1);
@@ -36,19 +39,16 @@ int main(){
             c = '\n';
             uart_send(&c, 1);
         }
-    }while(c != 'q');
 
-    print("\r\n");
-
-    int seconds, microseconds;
-    int target = 1;
-    while(target < 10){
         time_get(&seconds, (void *)0);
         if(seconds > target){
             led_write(target, 0xF);
             target++;
         }
-    }
+
+    }while(c != 'q');
+
+    print("\r\n");
 
     return 42;
 }
