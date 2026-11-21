@@ -124,9 +124,9 @@ drivers:
     - name: time_get
       id: 4
       params:
-        - type: "int *"
+        - type: "unsigned int *"
           name: seconds
-        - type: "int *"
+        - type: "unsigned int *"
           name: microseconds
 
 

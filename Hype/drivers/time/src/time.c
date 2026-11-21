@@ -12,15 +12,15 @@
 uint64_t __time_init_value;
 
 static uint64_t read_globaltimer(){
-    uint32_t hi1, hi2, lo;
+    uint32_t hi_reg_A, hi_reg_B, low_reg;
 
     do {
-        hi1 = GT_HI_REG;
-        lo  = GT_LO_REG;
-        hi2 = GT_HI_REG;
-    } while (hi1 != hi2);
+        hi_reg_A = GT_HI_REG;
+        low_reg  = GT_LO_REG;
+        hi_reg_B = GT_HI_REG;
+    } while (hi_reg_A != hi_reg_B);
 
-    return ((uint64_t)hi1 << 32) | lo;
+    return ((uint64_t)hi_reg_A << 32) | low_reg;
 }
 
 void __time_init(){
@@ -29,7 +29,7 @@ void __time_init(){
 
 }
 
-int __time_get(int * seconds, int * microseconds){
+int __time_get(unsigned int * seconds, unsigned int * microseconds){
     uint64_t gt_count;
     uint64_t __microseconds;
 
@@ -38,11 +38,10 @@ int __time_get(int * seconds, int * microseconds){
         __microseconds = gt_count / (GT_FREQ / 1000000ul);
 
         if(seconds != (void *)0){
-            *seconds = (int32_t)(__microseconds / 1000000ul);
+            *seconds = (unsigned int)(__microseconds / 1000000ul);
         }
         if(microseconds != (void *)0){
-            *microseconds = (int32_t)(__microseconds % 1000000ul);
-
+            *microseconds = (unsigned int)(__microseconds % 1000000ul);
         }
     }
     

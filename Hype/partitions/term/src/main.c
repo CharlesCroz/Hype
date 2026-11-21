@@ -16,7 +16,7 @@ void print(const char *str){
 int main(){
     int mask, value;
     char c;
-    int seconds;
+    unsigned int seconds;
     int target = 1;
 
     print("Hello from term partition!\n\r");

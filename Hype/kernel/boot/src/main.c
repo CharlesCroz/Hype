@@ -190,6 +190,9 @@ int main()
 
     _kprintf("Done, execution return value is %d\n\r", retval);
 
+    unsigned int sec, microsec;
+    __time_get(&sec, &microsec);
+    _kprintf("Entering loop after %d and %d us\n\r", sec, microsec);
 
     return 0;
 }

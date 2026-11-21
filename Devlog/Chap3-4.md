@@ -51,6 +51,13 @@ Version 0 of this is actually a couple of counter that increments when I call `t
 
 It worked from the partition point of view, but it's obiously wrong. And since the "proof of success" involved me looking at blinking LED... Anyways, back to timer setup!
 
+After struggling with a TTC (Triple Timer Counter), and its annoying IRQ handling (clear on read), I just went with simple on-demand uint64 arithmetics on the Global Timer 64 bits counter. 
+
+Then again, according to the blinking frequency of the LEDs that I can visually see from being physically in front of my board, it's a success.
+
+### We good?
+
+Yes, we are. The margin for improvement is immense, but it'll do for now. Back to hosting partitions!
 
 ## ARMv7 context elements
 
