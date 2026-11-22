@@ -77,6 +77,10 @@ To keep things simple, the three partitions will be a bit different:
 
 Like this, I can visually confirm that blinky and pushy do more or less what they should, and keep playing with term (even though... I'm not sure I should keep the `q` key behaviour... We'll see...).
 
+Oh, and I got the boot code to run two elf sequentially! I started term, got the return value, then started the endless loop of blinky!  
+
+![Sequential run](./images/Chap_3_4_SequentialRun.png)
+
 ### The partitions binary
 
 Header is:

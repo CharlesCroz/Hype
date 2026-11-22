@@ -16,20 +16,12 @@ void print(const char *str){
 
 
 int main(){
-    int mask, value;
     char c;
     unsigned int seconds;
     int target = 1;
 
-    print("Hello from term partition!\n\r");
-    led_write(0x2, 0xF);
-    led_read(&value, &mask);
-
-    print("Value: ");
-    for(int i = 0; i < value; i++){
-        print("X ");
-    }
-    print("\r\nPress [q] to exit\r\n");
+    print("Partition term started!\n\r");
+    print("Press [q] to exit\r\n");
 
     do{
         c = '\0';
