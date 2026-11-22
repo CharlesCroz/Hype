@@ -176,7 +176,6 @@ int main(){
         .current_slot = hype_scheduling_count - 1
     };
     tic_setup(1, scheduler, &scheduler_status);
-    // tic_setup(10, increase_tic, 0);
     gic_enable();
 
     /* Wait for UART TX to be empty before we start messing with things */
@@ -198,6 +197,14 @@ int main(){
     __asm("mov %[result], r0" : [result] "=r" (retval));
 
     _kprintf("Done, execution return value is %d\n\r", retval);
+
+
+    header = (struct elf_header *) 0x180000;
+    entrypoint = load_elf(header);
+    _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
+
+    hackjump(entrypoint);
+    __asm("mov %[result], r0" : [result] "=r" (retval));
 
     unsigned int sec, microsec;
     __time_get(&sec, &microsec);

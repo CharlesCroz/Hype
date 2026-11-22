@@ -61,5 +61,32 @@ Yes, we are. The margin for improvement is immense, but it'll do for now. After 
 
 ## ARMv7 context elements
 
-AFAIK, to properly define context and thus handle context switches, I'll need the following:
-- ?
+AFAIK, to properly define context and thus handle context switches, each partition will have:
+- General purpose registers R1-R11 + IP, SP, LR and PC
+- CPSR
+- MMU Table(s)
+
+Additionnaly, I'll proabably need to keep track of where the elf files actually are in a proper array, along with their size, and a checksum of some sort? Ok, the last one is more of a QoL kind of thing, but I should definitely start working on a tool to package partitions together and add a header.
+
+### The cast
+
+To keep things simple, the three partitions will be a bit different:
+- term: still the same, echoes uart char until `q` is press;
+- blinky: blinks leds 2 and 3 at 4Hz;
+- pushy: blinks leds 0 and 1 at 3Hz.
+
+Like this, I can visually confirm that blinky and pushy do more or less what they should, and keep playing with term (even though... I'm not sure I should keep the `q` key behaviour... We'll see...).
+
+### The partitions binary
+
+Header is:
+- Magic key 'Hyp0Part' (8 bytes)
+- N, number of entries (unsigned int, 8 bytes)
+- The N entries:
+  - Offset of entry name in binary
+  - Offset of Elf file in binary
+  - Size of Elf file in binary
+
+Followed by a section containing the names of the partitions, then the partitions!
+
+Looks sound, let's upgrade the config tool to make sort of a recipe file with the partitions id and names, and the script that turns this and the elfs into a partitions.bin! 

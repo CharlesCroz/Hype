@@ -7,7 +7,7 @@ partitions:
       len:      0x100000
       pa_start: 0x200000
     permissions:
-      - uart_receive
+      - uart_recv
       - uart_send
       - time_get
 
@@ -18,17 +18,20 @@ partitions:
       len:      0x100000
       pa_start: 0x1000000
     permissions:
+      - uart_send
       - time_get
+      - led_write
 
   - name: pushy
     id: 2
-    descr: "When a button has been pressed, prints something"
+    descr: "When a button has been pressed, prints something (for now, just blink...)"
     mmap:
       len:      0x100000
       pa_start: 0x1100000
     permissions:
       - uart_send
-      - btn_read
+      - time_get
+      - led_write
 
 schedule:
   period_ms: 1000
