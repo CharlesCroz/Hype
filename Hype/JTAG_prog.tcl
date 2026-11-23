@@ -25,8 +25,7 @@ targets -set -nocase -filter {name =~ "*A9*#0"}
 dow ./kernel/boot/obj/boot.elf
 configparams force-mem-access 0
 
-dow -data {./partitions/term/obj/term.elf} 0x100000
-dow -data {./partitions/blinky/obj/blinky.elf} 0x180000
+dow -data {./partitions/partitions.bin} 0x100000
 
 # Starts CPU0
 con

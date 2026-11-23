@@ -94,3 +94,17 @@ Header is:
 Followed by a section containing the names of the partitions, then the partitions!
 
 Looks sound, let's upgrade the config tool to make sort of a recipe file with the partitions id and names, and the script that turns this and the elfs into a partitions.bin! 
+
+That part went smoother than expected:
+
+```bash
+$ python3 ./Hype/partitions/package_partitions.py ./Hype/partitions/
+Sucessfully wrote 3 partitions into ./Hype/partitions//partitions.bin
+        term    0x00001630 bytes at offset 0x00000060
+        blinky  0x0000169C bytes at offset 0x000016A0
+        pushy   0x00001694 bytes at offset 0x00002D40
+```
+
+and the kernel loads them!
+
+![Loading Partitions binary](./images/Chap_3_4_PartitionsBinary.png)

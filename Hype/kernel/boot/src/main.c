@@ -35,17 +35,19 @@ void scheduler(void *param){
 }
 
 
-void print_elf_header(const struct elf_header *header){
+void print_elf_header(const struct elf_header *header, int is_short){
     _kprintf("ELF file located at 0x%p\n\r",                     (unsigned int) header);
-    _kprintf("e_ident[0:3] magic [0x%x]%c%c%c\n\r",              (int) header->e_ident[0], header->e_ident[1],
-             header->e_ident[2], header->e_ident[3]);
-    _kprintf("e_ident[4] class   0x%x (1:32bits, 2:64bits)\n\r", (int) header->e_ident[4]);
-    _kprintf("e_type             0x%x\n\r",                      (int) header->e_type);
-    _kprintf("e_machine          0x%x\n\r",                      (int) header->e_machine);
-    _kprintf("e_entry            0x%p\n\r",                      (int) header->e_entry);
-    _kprintf("Program e_phoff    0x%p\n\r",                      (int) header->e_phoff);
-    _kprintf("Section e_shoff    0x%p\n\r",                      (int) header->e_shoff);
-    _kprintf("e_shstrndx         0x%p\n\r",                      (int) header->e_shstrndx);
+    if(!is_short){
+        _kprintf("e_ident[0:3] magic [0x%x]%c%c%c\n\r",           (int) header->e_ident[0], header->e_ident[1],
+                 header->e_ident[2], header->e_ident[3]);
+        _kprintf("e_ident[4] class   0x%x (1:32b, 2:64b)\n\r", (int) header->e_ident[4]);
+        _kprintf("e_type             0x%x\n\r",                      (int) header->e_type);
+        _kprintf("e_machine          0x%x\n\r",                      (int) header->e_machine);
+        _kprintf("e_entry            0x%p\n\r",                      (int) header->e_entry);
+        _kprintf("Program e_phoff    0x%p\n\r",                      (int) header->e_phoff);
+        _kprintf("Section e_shoff    0x%p\n\r",                      (int) header->e_shoff);
+        _kprintf("e_shstrndx         0x%p\n\r",                      (int) header->e_shstrndx);
+    }
 
 
     const struct elf_pheader *pheaders = (const struct elf_pheader *) ((unsigned int) header
@@ -63,16 +65,18 @@ void print_elf_header(const struct elf_header *header){
         _kprintf("  p_align  0x%p\n\r",         pheaders[i].p_align);
     }
 
-    const struct elf_sheader *sheaders = (const struct elf_sheader *) ((unsigned int) header
-                                                                       + (unsigned int) header->e_shoff);
-    const char *section_names = (char *) ((uint32_t) header + (uint32_t) sheaders[header->e_shstrndx].sh_offset);
-    _kprintf("Section names at 0x%p\r\n", sheaders[header->e_shstrndx].sh_offset);
-
-    for(int i = 0 ; i < header->e_shnum; i++){
-        _kprintf("Section header %i : %s",
-                 i, &section_names[sheaders[i].sh_name]);
-        _kprintf("\tsh_type 0x%x, sh_size 0x%x, sh_offset 0x%x\n\r",
-                 sheaders[i].sh_type, sheaders[i].sh_size, sheaders[i].sh_offset);
+    if(!is_short){
+        const struct elf_sheader *sheaders = (const struct elf_sheader *) ((unsigned int) header
+                                                                           + (unsigned int) header->e_shoff);
+        const char *section_names = (char *) ((uint32_t) header + (uint32_t) sheaders[header->e_shstrndx].sh_offset);
+        _kprintf("Section names at 0x%p\r\n", sheaders[header->e_shstrndx].sh_offset);
+    
+        for(int i = 0 ; i < header->e_shnum; i++){
+            _kprintf("Section header %i : %s",
+                     i, &section_names[sheaders[i].sh_name]);
+            _kprintf("\tsh_type 0x%x, sh_size 0x%x, sh_offset 0x%x\n\r",
+                     sheaders[i].sh_type, sheaders[i].sh_size, sheaders[i].sh_offset);
+        }
     }
 } /* print_elf_header */
 
@@ -126,7 +130,7 @@ void compare_elf(struct elf_header *header, const uint8_t *ref){
 } /* compare_elf */
 
 
-void * load_elf(struct elf_header *elf){
+void * load_elf(const struct elf_header *elf){
     const struct elf_pheader *pheaders = (const struct elf_pheader *) ((unsigned int) elf
                                                                        + (unsigned int) elf->e_phoff);
 
@@ -183,32 +187,53 @@ int main(){
         /* nop */
     }
 
-    struct elf_header *header = (struct elf_header *) 0x100000;
-    print_elf_header(header);
+    struct partition_header *p_header = (struct partition_header *) 0x100000; 
+
+    _kprintf("Exploring partition binary at 0x%p, containing %i partitions\n\r=================\n\r",
+             p_header, p_header->n_entries);
+
+    for(int i = 0; i < p_header->n_entries; i++){
+        const char *name = (const char *) ((unsigned int) p_header + p_header->entries[i].name_offset);
+        _kprintf("=== Partition[%d] '%s' binary at 0x%p, 0x%x bytes \n\r=================\n\r",
+                 i, name, p_header->entries[i].elf_offset, p_header->entries[i].elf_size);
+        const struct elf_header *elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
+        print_elf_header(elf_header, 1);
+    }
+
 
     /* Load and jump */
     void *entrypoint;
     volatile int retval;
 
-    entrypoint = load_elf(header);
-    _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
-
-    hackjump(entrypoint);
-    __asm("mov %[result], r0" : [result] "=r" (retval));
-
-    _kprintf("Done, execution return value is %d\n\r", retval);
+    for(int i = 0 ; i < p_header->n_entries; i++){
+        struct {
+            unsigned int sec;
+            unsigned int micro_sec;
+        } t_start, t_end, t_diff;
 
 
-    header = (struct elf_header *) 0x180000;
-    entrypoint = load_elf(header);
-    _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
+        const struct elf_header * elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
 
-    hackjump(entrypoint);
-    __asm("mov %[result], r0" : [result] "=r" (retval));
+        __time_get(&t_start.sec, &t_start.micro_sec);
 
-    unsigned int sec, microsec;
-    __time_get(&sec, &microsec);
-    _kprintf("Entering loop after %d and %d us\n\r", sec, microsec);
+        entrypoint = load_elf(elf_header);
+        _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
+    
+        hackjump(entrypoint);
+        __asm("mov %[result], r0" : [result] "=r" (retval));
+    
+        __time_get(&t_end.sec, &t_end.micro_sec);
+
+        t_diff.sec = t_end.sec - t_start.sec;
+        if(t_end.micro_sec < t_start.micro_sec){
+            t_end.micro_sec += 1000000;
+            t_end.sec--;
+        }
+        t_diff.micro_sec = t_end.micro_sec - t_start.micro_sec;
+    
+        _kprintf("Done, execution return value is %d\n\r", retval);
+        _kprintf("Entering loop after %d and %d us\n\r", t_diff.sec, t_diff.micro_sec);
+    }
 
     return 0;
 } /* main */

@@ -58,3 +58,4 @@ dkms.conf
 .Xil
 HW
 .venv
+__pycache__

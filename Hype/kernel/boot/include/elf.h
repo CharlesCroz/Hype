@@ -59,4 +59,17 @@ struct elf_sheader {
     uint32_t sh_entsize;
 };
 
+struct partition
+{
+    uint32_t name_offset;
+    uint32_t elf_offset;
+    uint32_t elf_size;
+};
+
+struct partition_header{
+    char magic[8];
+    uint32_t n_entries;
+    struct partition entries[];
+};
+
 #endif // ifndef __PROT_ELF
