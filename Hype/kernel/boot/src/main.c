@@ -139,7 +139,7 @@ void * load_elf(const struct elf_header *elf){
             const uint8_t *code_src = (const uint8_t *) ((unsigned int) elf + pheaders[i].p_offset);
             uint8_t *code_dst       = (uint8_t *) (pheaders[i].p_paddr);
 
-            _kprintf("Loading prog[%d] %d bytes at %p\n\r", i, pheaders[i].p_filesz, code_dst);
+            _kprintf("Loading elf prog[%d] %d bytes at %p\n\r", i, pheaders[i].p_filesz, code_dst);
 
             for(int byte = 0; byte < pheaders[i].p_filesz; byte++){
                 code_dst[byte] = code_src[byte];
@@ -189,15 +189,16 @@ int main(){
 
     struct partition_header *p_header = (struct partition_header *) 0x100000; 
 
-    _kprintf("Exploring partition binary at 0x%p, containing %i partitions\n\r=================\n\r",
+    _kprintf("Exploring partition binary at 0x%p, containing %i partitions\n\r",
              p_header, p_header->n_entries);
 
     for(int i = 0; i < p_header->n_entries; i++){
         const char *name = (const char *) ((unsigned int) p_header + p_header->entries[i].name_offset);
-        _kprintf("=== Partition[%d] '%s' binary at 0x%p, 0x%x bytes \n\r=================\n\r",
+        _kprintf("=================\n\r=== Partition[%d] '%s' binary at 0x%p, 0x%x bytes ===\n\r",
                  i, name, p_header->entries[i].elf_offset, p_header->entries[i].elf_size);
         const struct elf_header *elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
         print_elf_header(elf_header, 1);
+        _kprintf("=================\n\r\n\r");
     }
 
 
@@ -213,9 +214,11 @@ int main(){
 
 
         const struct elf_header * elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
+        const char *name = (const char *) ((unsigned int) p_header + p_header->entries[i].name_offset);
 
         __time_get(&t_start.sec, &t_start.micro_sec);
-
+        
+        _kprintf("Running partition[%i]:%s\n\r", i, name);
         entrypoint = load_elf(elf_header);
         _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
     
@@ -232,7 +235,7 @@ int main(){
         t_diff.micro_sec = t_end.micro_sec - t_start.micro_sec;
     
         _kprintf("Done, execution return value is %d\n\r", retval);
-        _kprintf("Entering loop after %d and %d us\n\r", t_diff.sec, t_diff.micro_sec);
+        _kprintf("Execution lasted %d s and %d us\n\r", t_diff.sec, t_diff.micro_sec);
     }
 
     return 0;
