@@ -8,16 +8,28 @@
 _vector_table:
 	B	_boot
 	B	Undefined
-	B	handle_syscall
+	B	decorate_syscall
 	B	PrefetchAbortHandler
 	B	DataAbortHandler
 	NOP	/* Placeholder for address exception vector*/
-	B	handle_irq
+	B	decorate_irq
 /*	B	FIQHandler Undefining this so the exception directly points to FIQ handler code */
 
 FIQHandler:			            /* FIQ vector handler */
 	b 		FIQHandler			/* Infinite loop.... for now ! */
 	subs	pc, lr, #4			/* adjust return */
+
+decorate_syscall:
+	push 	{r0-r12, lr}
+	bl 		handle_syscall
+	pop 	{r0-r12, lr}
+	movs	pc, lr
+
+decorate_irq:
+	push 	{r0-r12, lr}
+	bl 		handle_irq
+	pop 	{r0-r12, lr}
+	subs	pc, lr, #4
 
 Undefined:					/* Undefined handler */
 	movs	pc, lr

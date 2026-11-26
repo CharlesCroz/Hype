@@ -26,11 +26,13 @@ int main(){
     do{
         c = '\0';
         uart_recv(&c, 1);
-        if(c != '\0'){
-            uart_send(&c, 1);
-        }
         if(c == '\r'){
-            c = '\n';
+            char nlbr[] = "\n\r";
+            uart_send(nlbr, 2);
+        }else if(c == 0x7F){
+            char backspace[] = "\b \b";
+            uart_send(backspace, 3);
+        }else if(c >= 0x20 && c < 0x7F){
             uart_send(&c, 1);
         }
 

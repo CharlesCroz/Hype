@@ -24,7 +24,7 @@ struct handler_table_entry {
 #define IRQ_HANDLERS_COUNT 256
 struct handler_table_entry IRQ_HANDLERS_TABLE[IRQ_HANDLERS_COUNT] = { 0 };
 
-__attribute__((target("general-regs-only"), interrupt("IRQ")))
+
 void handle_irq(){
     volatile int irq_id;
 

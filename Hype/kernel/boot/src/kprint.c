@@ -1,6 +1,7 @@
 #include "xparameters.h"
 #include "kprint.h"
 #include "uart.h"
+#include "drivers.h"
 #include <stdarg.h>
 
 
@@ -166,7 +167,7 @@ void _kprintf(const char *pattern, ...){
     }
     va_end(args);
 
-    __uart_send(built_string, at);
+    uart_send(built_string, at);
 } /* _kprintf */
 
 

@@ -18,6 +18,9 @@ EXPORT_OBJ := $(wildcard $(EXPORT_LIB)/*.a)
 AUTOGEN_LOC ?= ../../autogen/kernel
 AUTOGEN_INC := $(AUTOGEN_LOC)/include
 AUTOGEN_OBJ := $(AUTOGEN_LOC)/obj
+# ToDo : formalize that a bit better
+AUTOGEN_INC2 := ../../autogen/partitions/include
+AUTOGEN_OBJS2 := $(wildcard ../../autogen/partitions/obj/*.o)
 
 ### Sources
 AUTOGEN_INCS := $(wildcard $(AUTOGEN_INC)/*.h)
@@ -45,8 +48,8 @@ S_OBJS := $(patsubst $(SRC)/%.S, $(OBJ)/%.o, $(S_SRCS))
 TARGET := $(OBJ)/$(TARGET)
 
 ## compiler and linker flags
-COMMON_FLAGS := -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard
-export CFLAGS  = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC) -I$(AUTOGEN_INC) -I$(EXPORT_INC)
+COMMON_FLAGS := -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -mgeneral-regs-only
+export CFLAGS  = $(COMMON_FLAGS) -Wall -O2 -fmessage-length=0 -I$(INC) -I$(AUTOGEN_INC) -I$(AUTOGEN_INC2) -I$(EXPORT_INC)
 export LDFLAGS = $(COMMON_FLAGS) -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,lscript.ld -Lobj -L$(AUTOGEN_INC) -L$(EXPORT_LIB)
 
 #################
@@ -61,7 +64,7 @@ $(OBJ)/%.o:$(SRC)/%.S
 	arm-none-eabi-gcc -c $(CFLAGS) -o $@ $<
 
 $(TARGET).elf: $(C_OBJS) $(S_OBJS) $(EXPORT_OBJ)
-	arm-none-eabi-gcc $(LDFLAGS) -o $@ $(C_OBJS) $(S_OBJS) $(AUTOGEN_OBJS) $(EXPORT_OBJ) $(LIBS) -Wl,--start-group,-lgcc,-lc,--end-group
+	arm-none-eabi-gcc $(LDFLAGS) -o $@ $(C_OBJS) $(S_OBJS) $(AUTOGEN_OBJS) $(EXPORT_OBJ) $(AUTOGEN_OBJS2) $(LIBS) -Wl,--start-group,-lgcc,-lc,--end-group
 
 clean:
 	rm -f **/*.o *~ **/*.elf

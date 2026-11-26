@@ -8,19 +8,15 @@ Get yourself `make` and `arm-none-eabi-gcc`, and here we go !
 
 Turn the config into auto-generated code:
 
-`python3 conftool/process_config.py conftool/configs/platform.yml conftool/configs/sample-conf.yml conftool/templates/ kernel/autogen/`
+`make autogen`
 
-Turn the auto-generated code into objects:
+Compile everything (autogen, drivers, kernel boot) into boot.elf:
 
-`make -C kernel/autogen`
+`make`
 
-Compile some drivers:
+Compile partitions into partitions.bin:
 
-`make -C kernel/drivers`
-
-Turn the auto-generated objects, and kernel code, into boot.elf:
-
-`make -C kernel/boot`
+`make -C kernel/partitions`
 
 
 # Profit

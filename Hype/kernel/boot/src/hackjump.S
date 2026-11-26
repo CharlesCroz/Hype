@@ -8,8 +8,7 @@
 hackjump:
     push {lr}
     blx r0
-    pop {lr}
-    bx lr
+    pop {pc}
 	
 
 .end

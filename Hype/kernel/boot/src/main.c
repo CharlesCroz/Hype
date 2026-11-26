@@ -6,6 +6,7 @@
 #include "time.h"
 #include "partitions_configuration.h"
 #include "elf.h"
+#include "drivers.h"
 
 #define REG_LED *((volatile int *) 0x40000000)
 
@@ -150,6 +151,19 @@ void * load_elf(const struct elf_header *elf){
     return (void *) elf->e_entry;
 }
 
+int check_magic(const char *target){
+    const char magic[] = "Hyp0Part";
+    const char *ptr = magic;
+
+    while(*ptr){
+        if(*ptr != *target){
+            return 0;
+        }
+        ptr++;
+        target++;
+    }
+    return 1;
+}
 
 int hackjump(void *addr);
 
@@ -189,54 +203,59 @@ int main(){
 
     struct partition_header *p_header = (struct partition_header *) 0x100000; 
 
-    _kprintf("Exploring partition binary at 0x%p, containing %i partitions\n\r",
-             p_header, p_header->n_entries);
-
-    for(int i = 0; i < p_header->n_entries; i++){
-        const char *name = (const char *) ((unsigned int) p_header + p_header->entries[i].name_offset);
-        _kprintf("=================\n\r=== Partition[%d] '%s' binary at 0x%p, 0x%x bytes ===\n\r",
-                 i, name, p_header->entries[i].elf_offset, p_header->entries[i].elf_size);
-        const struct elf_header *elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
-        print_elf_header(elf_header, 1);
-        _kprintf("=================\n\r\n\r");
-    }
-
-
-    /* Load and jump */
-    void *entrypoint;
-    volatile int retval;
-
-    for(int i = 0 ; i < p_header->n_entries; i++){
-        struct {
-            unsigned int sec;
-            unsigned int micro_sec;
-        } t_start, t_end, t_diff;
-
-
-        const struct elf_header * elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
-        const char *name = (const char *) ((unsigned int) p_header + p_header->entries[i].name_offset);
-
-        __time_get(&t_start.sec, &t_start.micro_sec);
+    if(check_magic(p_header->magic)){
         
-        _kprintf("Running partition[%i]:%s\n\r", i, name);
-        entrypoint = load_elf(elf_header);
-        _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
+        _kprintf("Exploring partition binary at 0x%p, containing %i partitions\n\r",
+                 p_header, p_header->n_entries);
     
-        hackjump(entrypoint);
-        __asm("mov %[result], r0" : [result] "=r" (retval));
-    
-        __time_get(&t_end.sec, &t_end.micro_sec);
-
-        t_diff.sec = t_end.sec - t_start.sec;
-        if(t_end.micro_sec < t_start.micro_sec){
-            t_end.micro_sec += 1000000;
-            t_end.sec--;
+        for(int i = 0; i < p_header->n_entries; i++){
+            const char *name = (const char *) ((unsigned int) p_header + p_header->entries[i].name_offset);
+            _kprintf("=================\n\r=== Partition[%d] '%s' binary at 0x%p, 0x%x bytes ===\n\r",
+                     i, name, p_header->entries[i].elf_offset, p_header->entries[i].elf_size);
+            const struct elf_header *elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
+            print_elf_header(elf_header, 1);
+            _kprintf("=================\n\r\n\r");
         }
-        t_diff.micro_sec = t_end.micro_sec - t_start.micro_sec;
     
-        _kprintf("Done, execution return value is %d\n\r", retval);
-        _kprintf("Execution lasted %d s and %d us\n\r", t_diff.sec, t_diff.micro_sec);
+    
+        for(int i = 0 ; i < p_header->n_entries; i++){
+            void *entrypoint;
+            volatile int retval;
+            struct {
+                unsigned int sec;
+                unsigned int micro_sec;
+            } t_start, t_end, t_diff;
+            const struct elf_header * elf_header;
+            const char *name;
+
+            elf_header = (const struct elf_header *)((unsigned int) p_header + p_header->entries[i].elf_offset);
+            name = (const char *) ((unsigned int) p_header + p_header->entries[i].name_offset);
+    
+            time_get(&t_start.sec, &t_start.micro_sec);
+            
+            _kprintf("Running partition[%i]:%s\n\r", i, name);
+            entrypoint = load_elf(elf_header);
+            _kprintf("Ready to jump to code at 0x%p\n\r", entrypoint);
+        
+            retval = hackjump(entrypoint);
+            
+            
+            time_get(&t_end.sec, &t_end.micro_sec);
+            
+            t_diff.sec = t_end.sec - t_start.sec;
+            if(t_end.micro_sec < t_start.micro_sec){
+                t_end.micro_sec += 1000000;
+                t_end.sec--;
+            }
+            t_diff.micro_sec = t_end.micro_sec - t_start.micro_sec;
+            
+            _kprintf("Done, execution return value is %d\n\r", retval);
+            _kprintf("Execution lasted %d s and %d us\n\r", t_diff.sec, t_diff.micro_sec);
+        }
+    }else{
+        _kprintf("Partition Binary not found\n\r");
     }
+
 
     return 0;
 } /* main */
