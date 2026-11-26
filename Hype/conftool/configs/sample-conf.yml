@@ -16,7 +16,7 @@ partitions:
     descr: "Periodically blinks LEDs"
     mmap:
       len:      0x100000
-      pa_start: 0x1000000
+      pa_start: 0x300000
     permissions:
       - uart_send
       - time_get
@@ -27,22 +27,22 @@ partitions:
     descr: "When a button has been pressed, prints something (for now, just blink...)"
     mmap:
       len:      0x100000
-      pa_start: 0x1100000
+      pa_start: 0x400000
     permissions:
       - uart_send
       - time_get
       - led_write
 
 schedule:
-  period_ms: 1000
+  period_ms: 50
   cpu0:
     - from_ms: 0
-      to_ms: 800
+      to_ms: 30
       partition: 0
-    - from_ms: 800
-      to_ms: 900
-      partition: 2
-    - from_ms: 900
-      to_ms: 1000
+    - from_ms: 30
+      to_ms: 40
       partition: 1
+    - from_ms: 40
+      to_ms: 50
+      partition: 2
 

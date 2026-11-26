@@ -22,7 +22,7 @@ int main(){
     struct time current_time = { 0 };
     struct time target_time = { 0 };
     
-    const char greetings[] = "Blinky started partition!\n\r";
+    const char greetings[] = "Pushy started partition (and I'll blink forever)!\n\r";
     
     uart_send(greetings, sizeof(greetings));
     

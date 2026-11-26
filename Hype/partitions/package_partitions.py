@@ -1,6 +1,6 @@
 import argparse
-import os
 from math import ceil
+from partitions_config import partitions
 
 
 def align(dest, alignment):
@@ -10,13 +10,6 @@ def align(dest, alignment):
 
 
 def main(partitions_dir):
-    #walk subdirs to add elfs
-    partitions = []
-    for _, _, files in os.walk(partitions_dir):
-        for f in files:
-            if f[-4:] == ".elf":
-                partitions.append({"name":f[:-4]})
-
 
     with open(f"{partitions_dir}/partitions.bin", "wb+") as dest:
         dest.write("Hyp0Part".encode(encoding="ascii"))

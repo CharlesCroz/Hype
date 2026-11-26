@@ -108,3 +108,10 @@ Sucessfully wrote 3 partitions into ./Hype/partitions//partitions.bin
 and the kernel loads them!
 
 ![Loading Partitions binary](./images/Chap_3_4_PartitionsBinary.png)
+
+## No MMU for you
+
+So... Before going for MMU configuration (for which I think I'll have to relocate the kernel to high memory...), I'll go with a no MMU context switch between the three partitions.
+
+So, first, rework the linker scripts, to put the partitions at addresses 0x20_0000 + (partition_ID) * 0x10_0000.
+ 

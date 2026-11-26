@@ -140,7 +140,7 @@ void * load_elf(const struct elf_header *elf){
             const uint8_t *code_src = (const uint8_t *) ((unsigned int) elf + pheaders[i].p_offset);
             uint8_t *code_dst       = (uint8_t *) (pheaders[i].p_paddr);
 
-            _kprintf("Loading elf prog[%d] %d bytes at %p\n\r", i, pheaders[i].p_filesz, code_dst);
+            _kprintf("Loading elf prog[%d] %d bytes at 0x%p\n\r", i, pheaders[i].p_filesz, code_dst);
 
             for(int byte = 0; byte < pheaders[i].p_filesz; byte++){
                 code_dst[byte] = code_src[byte];
@@ -239,7 +239,7 @@ int main(){
         
             retval = hackjump(entrypoint);
             
-            
+
             time_get(&t_end.sec, &t_end.micro_sec);
             
             t_diff.sec = t_end.sec - t_start.sec;

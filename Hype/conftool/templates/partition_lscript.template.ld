@@ -1,6 +1,6 @@
 MEMORY
 {
-   RAM_allocated : ORIGIN = 0, LENGTH = /*%%MEM_LEN%%*/
+   RAM_allocated : ORIGIN = /*%%MEM_ORIG%%*/, LENGTH = /*%%MEM_LEN%%*/
 }
 
 ENTRY(main)
